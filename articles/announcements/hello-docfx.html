@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Hello, DocFX! | Red Sea Markup Language </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Hello, DocFX! | Red Sea Markup Language ">
+      
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/blob/docs/docs/articles/announcements/hello-docfx.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/xsmall.png" alt="Red Sea Markup Language">
+            Red Sea Markup Language
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="hello-docfx">Hello, DocFX!</h1>
+
+<blockquote>
+<p>Written by <a href="https://github.com/mf366-dev">Matthew</a> at <a href="https://github.com/OceanApocalypseStudios">OceanApocalypseStudios</a> on July 10, 2026.</p>
+<p>It will take about 1:57 to read this article at 220 WPM <em>(average reading speed)</em>.</p>
+</blockquote>
+<p>This is the very first blog article to be available to the public in RSML's site. Those who have followed the development of this project certainly have noticed the site is looking <em>somewhat</em> different. Well, you're clearly not wrong!</p>
+<p>Today marks the day we, at OceanApocalypseStudios, have officially ditched <a href="https://www.mkdocs.org">mkdocs</a> for <a href="https://dotnet.github.io/docfx/">DocFX</a>. Throughout this article, we'll be focusing on what aspects of Red Sea Markup Language lead to this decision and what it affects.</p>
+<h2 id="why-change">Why change?</h2>
+<p>The main reason for the change was convenience. We're a small team and, because of that, it takes some time to release the projects and it also takes time to write documentation for them, such as guides and walkthroughs, as well as some minor articles for those following RSML's development.</p>
+<p>Back when we were using mkdocs, we needed to manually create the API reference: it was not fun. We ended up having the <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/">XML documentation</a> in the source code and then we had to essentially port it manually to Markdown &mdash; it felt like a huge waste of time that could have been put into creating walkthroughs or expanding RSML's online presence.</p>
+<p>DocFX, unlike mkdocs, is made <strong>for</strong> .NET primarily, so it automatically creates API references from the source projects, allowing us to focus on the more important tasks, which are the ones that require manual and granular control.</p>
+<p>We want to clarify we are not saying mkdocs is not great: it is! However, for our case (a .NET library with XML comments), there was a better alternative, one that reads those very same XML comments and, using the built DLL, generates meaningful documentation from that.</p>
+<figure>
+<p><img src="../images/hello-docfx-old-website-demo.png" alt="Old Site">
+<img src="../images/hello-docfx-new-website-demo.png" alt="New Site"></p>
+<figcaption>The old and new RSML websites, side-by-side</figcaption>
+</figure>
+<h2 id="is-the-site-fully-finished">Is the site fully finished?</h2>
+<p>Nowhere near finished 🙃</p>
+<p>We are still working on v3.0.0-prerelease1, which means the site will also be updated frequently with new documentation, guides and whatnot. Even if we pretend for a second no more documentation will be added (which is unthinkable, as the site still has pages marked with &ldquo;TODO&rdquo;), we will change some aspects of the site's design.</p>
+<hr>
+<p>We, at OceanApocalypseStudios, are constantly working on both new and existing projects: we've released <a href="https://oceanapocalypsestudios.org/MurkyMarshParser/">MurkyMarshParser</a> to the public very recently and are now focused on crafting the biggest RSML release so far, little by little.</p>
+<p>The move from mkdocs to DocFX has proved to complete a lot of tasks that were previously ours to get done, giving us time to focus on what truly matters.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/blob/docs/docs/articles/announcements/hello-docfx.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          See on <a href="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/">GitHub</a>.<br>Docs made with <a href="https://dotnet.github.io/docfx/">DocFX</a> and <a href="https://ovasquez.github.io/docfx-material/">Material</a>.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

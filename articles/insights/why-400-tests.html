@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Why 400 tests? | Red Sea Markup Language </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Why 400 tests? | Red Sea Markup Language ">
+      
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/blob/docs/docs/articles/insights/why-400-tests.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/xsmall.png" alt="Red Sea Markup Language">
+            Red Sea Markup Language
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="why-400-tests">Why 400 tests?</h1>
+
+<blockquote>
+<p>Written by <a href="https://github.com/mf366-dev">Matthew</a> at <a href="https://github.com/OceanApocalypseStudios">OceanApocalypseStudios</a> on July 14, 2026.</p>
+<p>It will take about 1:45 to read this article at 220 WPM <em>(average reading speed)</em>.</p>
+</blockquote>
+<p>Before we get into the article, I want to inform you it will be much shorter than the last one, mostly because, currently, the focus is finishing <a href="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/issues/60">#60</a> and finally moving on to RSML's lexer and respective modularity system.</p>
+<p>Today, we have officially hit the following milestone in RSML: 400 test methods&hellip; for a single class&hellip; and it's still not fully tested.
+Before you bring your anti-testing and <code>Console.WriteLine()</code> pitchforks forward, let us explain why we have implemented that many test methods&hellip;</p>
+<h2 id="context-matters">Context matters</h2>
+<p>In this case, context matters a lot. The class that has received this much testing attention is <a href="../../api/OceanApocalypseStudios.RSML.Sources.ReadOnlyStringBuffer.html"><code>ReadOnlyStringBuffer</code></a>, and it serves as the simplest buffer available in the entirety of the official RSML API, yet 400 tests were only half* of what was needed to get it to work properly.</p>
+<p>At OceanApocalypseStudios, we believe testing buffers and big language components (such as lexers and parsers) is imperative to ease the task of getting them to work correctly. If this means testing a lot, then it's a sacrifice that we believe is worth making.</p>
+<p>It's worth mentioning this does <strong>not</strong> mean in any way that we believe testing is only relevant when the components are critical: testing is still important when they're not &mdash; the only difference is that it's even more important when the components are critical.</p>
+<p>Following the same rationale, we are <strong>not</strong> saying quantity matters more than quality: RSML could have 9000 tests and could be a broken mess or have 10 tests and work perfectly. We believe a good combination of both is the best compromise a developer can choose.</p>
+<p style="font-size: 82%;">*This is an assumption, based on the current amount of test methods and the amount of methods that are yet to be tested.</p>
+<h2 id="expecting-more-tests">Expecting more tests?</h2>
+<p>One word: <strong>yes</strong>. Not because we love writing tests, but because there are still  methods that are publicly exposed yet are fully untested by now. Hopefully, they won't stay that way for much longer, and I'll be happy to write a new article once we can finally mark <a href="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/issues/60">#60</a> as closed.</p>
+<hr>
+<p>Like I said, this was quite a small article, and a bigger one is to be expected soon.</p>
+<p>Thank you for dropping by and reading! ❤️</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/blob/docs/docs/articles/insights/why-400-tests.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          See on <a href="https://github.com/OceanApocalypseStudios/RedSeaMarkupLanguage/">GitHub</a>.<br>Docs made with <a href="https://dotnet.github.io/docfx/">DocFX</a> and <a href="https://ovasquez.github.io/docfx-material/">Material</a>.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
