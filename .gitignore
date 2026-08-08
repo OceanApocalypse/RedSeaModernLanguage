@@ -378,9 +378,7 @@ _ReSharper*/
 *__NOTYET
 
 # Configs
-.vscode/*
-!.vscode/tasks.json
-!.vscode/enable.settings.jsonc
+.vscode/
 
 # Site (on main)
 site/
@@ -401,7 +399,7 @@ docs/__site/
 docs/api/
 
 # SonarQube has config for SonarScanner and stuff - dont track it
-.sonarqube
+.sonarqube/
 
 # SonarLint is team configuration for SonarQube for IDE - track it
-!.sonarlint
+!.sonarlint/
