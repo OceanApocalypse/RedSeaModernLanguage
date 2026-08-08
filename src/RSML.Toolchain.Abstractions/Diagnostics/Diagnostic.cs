@@ -12,9 +12,14 @@ namespace OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
 public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 {
 	/// <summary>
-	/// The span the error relates to.
+	/// The start index the error relates to (inclusive).
 	/// </summary>
-	public SourceSpan Span { get; }
+	public (Index Index, int Line, int Column) Start { get; } = (0, 0, 0);
+
+	/// <summary>
+	/// The end index the error relates to (exclusive).
+	/// </summary>
+	public (Index Index, int Line, int Column) End { get; } = (0, 0, 0);
 
 	/// <summary>
 	/// The error's code. Contains information about the category of the error.
@@ -44,7 +49,6 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
-		Span = SourceSpan.Empty;
 		Message = "";
 		Severity = Severity.None;
 	}
@@ -58,7 +62,6 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
-		Span = SourceSpan.Empty;
 		Message = message;
 		Severity = Severity.None;
 	}
@@ -72,7 +75,6 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
-		Span = SourceSpan.Empty;
 		Message = "";
 		Severity = severity;
 	}
@@ -87,23 +89,24 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
-		Span = SourceSpan.Empty;
 		Message = message;
 		Severity = severity;
 	}
 
 	/// <summary>Creates a new diagnostic.</summary>
 	/// <param name="code">The error code.</param>
-	/// <param name="span">The span the error relates to.</param>
+	/// <param name="spanStart">The inclusive start of the range.</param>
+	/// <param name="spanEnd">The exclusive end of the range.</param>
 	/// <param name="message">A brief error message detailing why it has happened.</param>
 	/// <param name="severity">The error's severity.</param>
-	public Diagnostic(string code, SourceSpan span, string message, Severity severity)
+	public Diagnostic(string code, (Index idx, int line, int col) spanStart, (Index idx, int line, int col) spanEnd, string message, Severity severity)
 	{
 		ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
-		Span = span;
+		Start = spanStart;
+		End = spanEnd;
 		Message = message;
 		Severity = severity;
 	}
@@ -115,7 +118,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 	) => obj is Diagnostic error && Equals(error);
 
 	/// <inheritdoc/>
-	public bool Equals(Diagnostic other) => Message == other.Message && Code == other.Code && Severity == other.Severity && Span.Equals(other.Span);
+	public bool Equals(Diagnostic other) => Message == other.Message && Code == other.Code && Severity == other.Severity && Start.Equals(other.Start) && End.Equals(other.End);
 
 	/// <summary>
 	/// Checks if two <see cref="Diagnostic"/>s are equal to each other.
@@ -130,13 +133,13 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 	public static bool operator !=(Diagnostic left, Diagnostic right) => !left.Equals(right);
 
 	/// <inheritdoc/>
-	public override int GetHashCode() => unchecked(HashCode.Combine(Span, Code, Message, Severity));
+	public override int GetHashCode() => unchecked(HashCode.Combine(Start, End, Code, Message, Severity));
 
 	/// <summary>
 	/// Returns a generic string representation of the current instance.
 	/// </summary>
 	/// <returns>The string representation.</returns>
-	public override string ToString() => $"Diagnostic(Code={Code}, Span={Span}, Message={Message}, Severity={Severity})";
+	public override string ToString() => $"Diagnostic(Code={Code}, Start={Start}, End={End}, Message={Message}, Severity={Severity})";
 
 	/// <summary>
 	/// Given a format, tries to return a string that uses said format as a basis for the representation.
@@ -153,7 +156,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 			case "I":
 			case "INIT":
 			case "NET":
-				return $"new Diagnostic(\"{Code}\", {Span.ToString("ctor", null)}, \"{Message}\", {Severity})";
+				return $"new Diagnostic(\"{Code}\", \"{Start}\", \"{End}\", \"{Message}\", {Severity})";
 
 			case "LOG":
 				string prefix = Severity switch
@@ -165,21 +168,35 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 					_ => ""
 				};
 
-				if (Span.IsSingleLine)
-					return $"[{prefix}{Code}] @ L{Span.Start.Line + 1},C({Span.Start.Column + 1}..{Span.End.Column + 1}) : {Message}";
+				if (Start.Line == End.Line)
+					return $"[{prefix}{Code}] @ L{Start.Line + 1},C({Start.Column + 1}..{End.Column + 1}) : {Message}";
 
-				return $"[{prefix}{Code}] @ L({Span.Start.Line + 1}..{Span.End.Line + 1}),C({Span.Start.Column + 1}..{Span.End.Column + 1}) : {Message}";
+				return $"[{prefix}{Code}] @ L({Start.Line + 1}..{End.Line + 1}),C({Start.Column + 1}..{End.Column + 1}) : {Message}";
 
 			case "JSON":
-				return
-					$$"""
-					  {
-					    "errorCode": "{{Code}}",
-					  	"span": {{Span.ToString("JSON", null)}},
-					  	"message": "{{Message}}",
-					  	"severity": "{{Severity}}"
-					  }
-					  """;
+				return $$"""
+					{
+						"errorCode": "{{Code}}",
+						"range": [
+							{
+								"index": {
+									"value": {{Start.Index.Value}},
+									"isFromEnd": {{Start.Index.IsFromEnd}}
+								},
+								"line": {{Start.Line}},
+								"column": {{Start.Column}}
+							},
+							{
+								"index": {
+									"value": {{End.Index.Value}},
+									"isFromEnd": {{End.Index.IsFromEnd}}
+								},
+								"line": {{End.Line}},
+								"column": {{End.Column}}
+							}
+						]
+					}
+					""";
 
 			default:
 				return ToString();

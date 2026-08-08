@@ -5,6 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Refers to a single location.", Scope = "member", Target = "~P:OceanApocalypse.RSML.Toolchain.Sources.ReadOnlyStringBuffer.Item(OceanApocalypse.RSML.Toolchain.Abstractions.Sources.SourceLocation)")]
 [assembly: SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Not an unnecessary suppression.", Scope = "member", Target = "~M:OceanApocalypse.RSML.Toolchain.Sources.ReadOnlyStringBuffer.#ctor(System.Byte*,System.Int32,System.Text.Encoding)")]
 [assembly: SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Not an unnecessary suppression.", Scope = "member", Target = "~M:OceanApocalypse.RSML.Toolchain.Sources.ReadOnlyStringBuffer.BuildCache")]

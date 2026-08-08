@@ -64,13 +64,13 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	}
 
 	/// <inheritdoc/>
+	public ReadOnlySpan<char> this[Range range] => data.AsSpan()[range];
+
+	/// <inheritdoc/>
+	public char this[Index index] => data[index];
+
+	/// <inheritdoc/>
 	public char this[int index] => data[index];
-
-	/// <inheritdoc/>
-	public char this[SourceLocation location] => this[location.Index];
-
-	/// <inheritdoc/>
-	public ReadOnlySpan<char> this[SourceSpan span] => data.AsSpan().Slice(span.Start.Index, span.Length);
 
 	/// <summary>
 	/// Initializes a new <see cref="ReadOnlyStringBuffer"/>
@@ -141,31 +141,31 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public int CountUntilEndOfLine(int index, out bool isCrLf)
+	public int CountUntilEndOfLine(Index index, out bool isCrLf)
 	{
 		isCrLf = false;
+		int offset = index.GetOffset(Length);
 
 		ThrowIfEmpty();
-		index = NormalizeIndex(index);
-		ThrowIfOutOfRange(index, true);
+		ThrowIfOutOfRange(offset, true);
 
-		if (index == Length)
+		if (offset == Length)
 			return 0; // consumed the entire buffer
 
 		ComputeLineStarts();
 
-		int lineSep = GetNextLineStartPosition(index, out _);
+		int lineSep = GetNextLineStartPosition(offset, out _);
 		isCrLf = precededByCrLf.Contains(lineSep) && data[index] is not '\n'; // to us, CRLF is only when we're not standing on the LF
 
 		if (isCrLf)
 			lineSep--; // skip the extra line separator in the CRLF sequence
 
-		if (!(IsLastLine(index) && !data[^1].IsNewline())) // if we're not on the last line and it doesn't end with a newline then
+		if (!(IsLastLine(offset) && !data[^1].IsNewline())) // if we're not on the last line and it doesn't end with a newline then
 		{
 			lineSep--;
 		}
 
-		return lineSep - index;
+		return lineSep - offset;
 	}
 
 	/// <remarks>
@@ -183,13 +183,13 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public int CountUntilNotWhitespace(int index)
+	public int CountUntilNotWhitespace(Index index)
 	{
 		ThrowIfEmpty();
-		index = NormalizeIndex(index);
-		ThrowIfOutOfRange(index, true);
+		int offset = index.GetOffset(Length);
+		ThrowIfOutOfRange(offset, true);
 
-		if (index == Length)
+		if (offset == Length)
 			return 0; // consumed the entire buffer
 
 		var span = data.AsSpan(index);
@@ -216,16 +216,16 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public int CountUntilWhitespace(int index)
+	public int CountUntilWhitespace(Index index)
 	{
 		ThrowIfEmpty();
-		index = NormalizeIndex(index);
-		ThrowIfOutOfRange(index, true);
+		int offset = index.GetOffset(Length);
+		ThrowIfOutOfRange(offset, true);
 
-		if (index == Length)
+		if (offset == Length)
 			return 0; // consumed the entire buffer
 
-		var span = data.AsSpan(index);
+		var span = data.AsSpan(offset);
 		int count = 0;
 
 		while (count < span.Length && !Char.IsWhiteSpace(span[count]))
@@ -249,19 +249,19 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public int CountWhile(Func<int, char, bool> predicate, int index)
+	public int CountWhile(Index index, Func<int, char, bool> predicate)
 	{
 		if (predicate is null)
 			throw new ArgumentNullException(nameof(predicate), "The object is null.");
 
 		ThrowIfEmpty();
-		index = NormalizeIndex(index);
-		ThrowIfOutOfRange(index, true);
+		int offset = index.GetOffset(Length);
+		ThrowIfOutOfRange(offset, true);
 
-		if (index == Length)
+		if (offset == Length)
 			return 0; // consumed the entire buffer
 
-		var span = data.AsSpan(index);
+		var span = data.AsSpan(offset);
 		int count = 0;
 
 		while (count < span.Length && predicate(count, span[count]))
@@ -312,7 +312,7 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public int GetLengthOfLineFromIndex(int index) => GetLengthOfLine(GetLineNumberFromIndex(index));
+	public int GetLengthOfLineFromIndex(Index index) => GetLengthOfLine(GetLineNumberFromIndex(index));
 
 	/// <remarks>
 	/// :::info[EOF Conventions]
@@ -320,14 +320,14 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public int GetLineNumberFromIndex(int index)
+	public int GetLineNumberFromIndex(Index index)
 	{
 		ThrowIfEmpty();
-		index = NormalizeIndex(index);
-		ThrowIfOutOfRange(index, true);
+		int offset = index.GetOffset(Length);
+		ThrowIfOutOfRange(offset, true);
 		ComputeLineStarts();
 
-		int lineSepIndex = GetPreviousOrCurrentLineStartPositionInLineStartList(index);
+		int lineSepIndex = GetPreviousOrCurrentLineStartPositionInLineStartList(offset);
 		return lineSepIndex;
 	}
 
@@ -356,40 +356,7 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	}
 
 	/// <inheritdoc/>
-	public ReadOnlySpan<char> GetLineFromIndex(int index) => GetLine(GetLineNumberFromIndex(index));
-
-	/// <remarks>
-	/// :::warning[EOF Conventions]
-	/// Unlike with other <see cref="ReadOnlyStringBuffer"/> methods, this one
-	/// does not follow EOF conventions and, because of that, does not accept the 
-	/// EOF index (index at <see cref="Length"/>), because it is not
-	/// considered a location.
-	/// :::
-	/// </remarks>
-	/// <inheritdoc/>
-	public SourceLocation GetSourceLocation(int index)
-	{
-		ThrowIfEmpty();
-		index = NormalizeIndex(index);
-		ThrowIfOutOfRange(index);
-
-		if (index == 0) // best "best" case = triple zero
-			return SourceLocation.Empty;
-
-		ComputeLineStarts();
-		int lineNumber = GetLineNumberFromIndex(index);
-
-		return new(index, lineNumber, index - lineStarts[lineNumber]);
-	}
-
-	/// <inheritdoc/>
-	public SourceSpan GetSourceSpan(int startIndex, int endIndex)
-	{
-		var start = GetSourceLocation(startIndex);
-		var end = GetSourceLocation(endIndex);
-
-		return new(start, end);
-	}
+	public ReadOnlySpan<char> GetLineFromIndex(Index index) => GetLine(GetLineNumberFromIndex(index));
 
 	/// <remarks>
 	/// :::warning[EOF Conventions]
@@ -400,15 +367,15 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public ReadOnlySpan<char> Slice(int start, int length)
+	public ReadOnlySpan<char> Slice(Index start, int length)
 	{
 		if (length < 0)
 			throw new ArgumentOutOfRangeException(nameof(length), "The slice length must be positive.");
 
-		start = NormalizeIndex(start);
-		ThrowIfOutOfRange(start, true, nameof(start));
+		int offset = start.GetOffset(Length);
+		ThrowIfOutOfRange(offset, true, nameof(start));
 
-		return data.AsSpan(start, length);
+		return data.AsSpan(offset, length);
 	}
 
 	/// <remarks>
@@ -420,7 +387,16 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public bool TrySlice(int start, Span<char> slice) => data.AsSpan(NormalizeIndex(start), slice.Length).TryCopyTo(slice);
+	public ReadOnlySpan<char> Slice(Range range)
+	{
+		int startOffset = range.Start.GetOffset(Length);
+		int endOffset = range.End.GetOffset(Length);
+
+		ThrowIfOutOfRange(startOffset, true, nameof(range));
+		ThrowIfOutOfRange(endOffset, true, nameof(range));
+
+		return data.AsSpan()[range];
+	}
 
 	/// <remarks>
 	/// :::warning[EOF Conventions]
@@ -431,7 +407,10 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public bool TrySlice(SourceSpan sourceSpan, Span<char> slice) => data.AsSpan(sourceSpan.Start.Index, sourceSpan.Length).TryCopyTo(slice);
+	public bool TrySlice(Index start, Span<char> slice) => data.AsSpan(start.GetOffset(Length), slice.Length).TryCopyTo(slice);
+
+	/// <inheritdoc/>
+	public bool TrySlice(Range range, Span<char> slice) => data.AsSpan()[range].TryCopyTo(slice);
 
 	/// <remarks>
 	/// :::info[EOF Conventions]
@@ -441,32 +420,17 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public bool TryGetChar(int index, out char item)
+	public bool TryGetChar(Index index, out char item)
 	{
 		item = '\0'; // default
 
-		if (IsEmpty)
-			return false;
-
-		index = NormalizeIndex(index);
-
-		if (IsOutOfRange(index))
+		if (IsEmpty || IsOutOfRange(index.IsFromEnd ? Length + (-index.Value) : index.Value))
 			return false;
 
 		item = data[index];
 
 		return true;
 	}
-
-	/// <remarks>
-	/// :::info[EOF Conventions]
-	/// This method follows the EOF convention where the EOF character
-	/// is 0 (<c>'\0'</c>) and the return value is <c>false</c>, due to EOF
-	/// not being an actual buffer location.
-	/// :::
-	/// </remarks>
-	/// <inheritdoc/>
-	public bool TryGetChar(SourceLocation location, out char item) => TryGetChar(location.Index, out item);
 
 	/// <remarks>
 	/// :::info[EOF Conventions]
@@ -503,15 +467,36 @@ public sealed class ReadOnlyStringBuffer : IBuffer, ISupportsCache
 	/// :::
 	/// </remarks>
 	/// <inheritdoc/>
-	public bool TryGetLineFromIndex(int index, Span<char> destination)
+	public bool TryGetLineFromIndex(Index index, Span<char> destination)
 	{
-		index = NormalizeIndex(index);
-
-		if (IsEmpty || IsOutOfRange(index, followEofConvention: true)) // avoids panic from GetLineNumberFromIndex
+		if (IsEmpty || IsOutOfRange(index.IsFromEnd ? Length + (-index.Value) : index.Value, followEofConvention: true)) // avoids panic from GetLineNumberFromIndex
 			return false;
 
 		var lineNumber = GetLineNumberFromIndex(index);
 		return TryGetLine(lineNumber, destination);
+	}
+
+	/// <remarks>
+	/// :::warning[EOF Conventions]
+	/// Unlike with other <see cref="ReadOnlyStringBuffer"/> methods, this one
+	/// does not follow EOF conventions and, because of that, does not accept the 
+	/// EOF index (index at <see cref="Length"/>), because it is not
+	/// considered a location.
+	/// :::
+	/// </remarks>
+	/// <inheritdoc/>
+	public (Index Index, int Line, int Column) GetLocationDetails(Index index)
+	{
+		ThrowIfEmpty();
+		ThrowIfOutOfRange(index.IsFromEnd ? Length + (-index.Value) : index.Value);
+
+		if (index.Value == 0) // best "best" case = triple zero
+			return (0, 0, 0);
+
+		ComputeLineStarts();
+		int lineNumber = GetLineNumberFromIndex(index);
+
+		return new(index, lineNumber, index.GetOffset(Length) - lineStarts[lineNumber]);
 	}
 
 	/// <inheritdoc/>

@@ -32,10 +32,9 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 		SkipWhitespaceAndComments();
 
 		if (cursor >= buffer.Length)
-			return Result.Success(new Token(TokenKind.Eof, null, SourceSpan.Empty));
+			return Result.Success(new Token(TokenKind.Eof, null, new()));
 
-		var startLoc = buffer.GetSourceLocation(cursor);
-
+		int startLoc = cursor;
 		char c = buffer[cursor];
 
 		// strings
@@ -51,7 +50,7 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 			return ScanIdentifierOrKeyword(startLoc);
 
 		if (c == '.')
-			return Result.Success(new Token(TokenKind.MemberAccess, null, new(startLoc, buffer.GetSourceLocation(++cursor))));
+			return Result.Success(new Token(TokenKind.MemberAccess, null, new(startLoc, ++cursor)));
 
 		// todo: add the remaining possible paths
 		return Result.Failure<Token>(new(LexerErrorCodes.FailedToLexToken, "Tried all possible token logic paths, but none was true.", Severity.Error));
@@ -82,7 +81,7 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 		}
 	}
 
-	private Result<Token> ScanNumber(SourceLocation startLoc)
+	private Result<Token> ScanNumber(int startLoc)
 	{
 		bool dot = false;
 
@@ -91,7 +90,7 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 			if (buffer[cursor] == '.')
 			{
 				if (dot)
-					return Result.Success(new Token(TokenKind.Number, null, new(startLoc, buffer.GetSourceLocation(cursor - 1))));
+					return Result.Success(new Token(TokenKind.Number, null, new(startLoc, cursor)));
 
 				else
 					dot = true;
@@ -100,10 +99,10 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 			cursor++;
 		}
 
-		return Result.Success(new Token(TokenKind.Number, null, new(startLoc, buffer.GetSourceLocation(cursor))));
+		return Result.Success(new Token(TokenKind.Number, null, new(startLoc, cursor)));
 	}
 
-	private Result<Token> ScanStringLiteral(SourceLocation startLoc)
+	private Result<Token> ScanStringLiteral(int startLoc)
 	{
 		cursor++;
 		bool escaping = false;
@@ -114,7 +113,8 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 			{
 				return Result.Failure<Token>(new(
 					LexerErrorCodes.UnterminatedStringLiteral,
-					new SourceSpan(startLoc, new(cursor, startLoc.Line, cursor - startLoc.Index + startLoc.Column)),
+					buffer.GetLocationDetails((Index)startLoc),
+					buffer.GetLocationDetails((Index)cursor),
 					"A string literal must begin and end in the same line.",
 					Severity.Error
 				));
@@ -132,24 +132,25 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 		if (cursor < buffer.Length)
 			cursor++; // skip end quote if anything beyond it
 
-		return Result.Success(new Token(TokenKind.StringLiteral, null, new(startLoc, buffer.GetSourceLocation(cursor))));
+		return Result.Success(new Token(TokenKind.StringLiteral, null, startLoc..cursor));
 	}
 
-	private Result<Token> ScanIdentifierOrKeyword(SourceLocation startLoc)
+	private Result<Token> ScanIdentifierOrKeyword(int startLoc)
 	{
 		while (cursor < buffer.Length && (Char.IsAsciiLetterOrDigit(buffer[cursor]) || buffer[cursor] == '_'))
 			cursor++;
 
-		SourceSpan span = new(startLoc, buffer.GetSourceLocation(cursor));
+		Range range = startLoc..cursor;
 
-		if (Keywords.Contains(buffer[span]))
+		if (Keywords.Contains(buffer[range]))
 		{
-			var token = new Token(GetKeywordTokenKind(buffer[span]), null, span); // is keyword
+			var token = new Token(GetKeywordTokenKind(buffer[range]), null, range); // is keyword
 
 			return token.Kind == TokenKind.Unknown
 				? Result.Failure<Token>(new(
 					LexerErrorCodes.FailedToIdentifyKeyword,
-					new SourceSpan(startLoc, new(cursor, startLoc.Line, cursor - startLoc.Index + startLoc.Column)),
+					buffer.GetLocationDetails(startLoc),
+					buffer.GetLocationDetails(cursor),
 					"Despite identifying the object in question as a keyword, the lexer failed to resolve exactly which keyword it was." +
 					"This likely means the keyword in question is reserved for future use, but isn't implemented yet.",
 					Severity.Error
@@ -158,7 +159,7 @@ public class BufferLexer(IBuffer buffer, DiagnosticCollector diagnostics) : Lexe
 		}
 		else
 		{
-			return Result.Success(new Token(TokenKind.Identifier, null, span)); // is identifier
+			return Result.Success(new Token(TokenKind.Identifier, null, range)); // is identifier
 		}
 	}
 

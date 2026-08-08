@@ -1,4 +1,4 @@
-using OceanApocalypse.RSML.Toolchain.Abstractions.Sources;
+using System;
 
 namespace OceanApocalypse.RSML.Language.Lexing.Tokens;
 
@@ -8,11 +8,11 @@ namespace OceanApocalypse.RSML.Language.Lexing.Tokens;
 /// </summary>
 /// <param name="Kind">An integer that identifies the type of token.</param>
 /// <param name="Value">The token's value.</param>
-/// <param name="Span">The span where the token occurs.</param>
-public record struct Token(TokenKind Kind, object? Value, SourceSpan Span)
+/// <param name="Range">The range where the token occurs.</param>
+public record struct Token(TokenKind Kind, object? Value, Range Range)
 {
 	/// <summary>
 	/// Empty token. Used when something goes wrong.
 	/// </summary>
-	public readonly static Token Empty = new(TokenKind.Unknown, null, SourceSpan.Empty);
+	public readonly static Token Empty = new(TokenKind.Unknown, null, new());
 }

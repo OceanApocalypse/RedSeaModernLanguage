@@ -7,7 +7,7 @@ namespace OceanApocalypse.RSML.Toolchain.Abstractions;
 /// <summary>
 /// Extension members for characters.
 /// </summary>
-public static class CharacterExtensions
+public static class Extensions
 {
 	extension(char character)
 	{
