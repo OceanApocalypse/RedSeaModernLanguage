@@ -1,4 +1,4 @@
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Cache;
+namespace OceanApocalypse.RSML.Abstractions.Cache;
 
 /// <summary>
 /// Represents a service or a type that supports cached data.

@@ -1,10 +1,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-using OceanApocalypse.RSML.Toolchain.Abstractions.Sources;
 
-
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
+namespace OceanApocalypse.RSML.Abstractions.Diagnostics;
 
 /// <summary>
 /// A diagnostic reported by RSML's API.

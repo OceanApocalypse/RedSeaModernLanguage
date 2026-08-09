@@ -1,6 +1,6 @@
 using System;
 
-using OceanApocalypse.RSML.Toolchain.Abstractions;
+using OceanApocalypse.RSML.Abstractions;
 
 namespace OceanApocalypse.RSML.Language.Parsing;
 

@@ -1,7 +1,7 @@
 using System;
 
 
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Sources;
+namespace OceanApocalypse.RSML.Abstractions.Sources;
 
 /// <summary>
 /// Represents a sequential scanner.

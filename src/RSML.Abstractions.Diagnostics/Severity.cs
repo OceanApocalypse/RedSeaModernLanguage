@@ -1,4 +1,4 @@
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
+namespace OceanApocalypse.RSML.Abstractions.Diagnostics;
 
 /// <summary>
 /// The severity of an error.

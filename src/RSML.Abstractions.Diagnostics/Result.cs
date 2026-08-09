@@ -1,8 +1,8 @@
 using System;
 
-using OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics.ErrorCodes;
+using OceanApocalypse.RSML.Abstractions.Diagnostics.ErrorCodes;
 
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
+namespace OceanApocalypse.RSML.Abstractions.Diagnostics;
 
 /// <summary>
 /// A collection of factory methods for easier initialization of <see cref="Result{TValue}"/> objects.

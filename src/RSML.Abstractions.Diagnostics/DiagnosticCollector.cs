@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
+namespace OceanApocalypse.RSML.Abstractions.Diagnostics;
 
 /// <summary>
 /// A list of RSML toolchain errors.
@@ -13,8 +12,13 @@ public sealed record DiagnosticCollector : IEnumerable<Diagnostic>
 	/// <summary>
 	/// Creates a new diagnostic collector.
 	/// </summary>
+	public DiagnosticCollector() => MinimumCriticalSeverity = Severity.Error;
+
+	/// <summary>
+	/// Creates a new diagnostic collector.
+	/// </summary>
 	/// <param name="minimumCriticalSeverity">The minimum diagnostic severity for a diagnostic to be considered critical.</param>
-	public DiagnosticCollector(Severity minimumCriticalSeverity = Severity.Error) => MinimumCriticalSeverity = minimumCriticalSeverity;
+	public DiagnosticCollector(Severity minimumCriticalSeverity) => MinimumCriticalSeverity = minimumCriticalSeverity;
 
 	private readonly List<Diagnostic> diagnostics = [];
 

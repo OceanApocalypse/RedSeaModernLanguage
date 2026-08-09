@@ -2,7 +2,7 @@ using System;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 
-namespace OceanApocalypse.RSML.Toolchain.Abstractions;
+namespace OceanApocalypse.RSML.Abstractions;
 
 /// <summary>
 /// Extension members for characters.

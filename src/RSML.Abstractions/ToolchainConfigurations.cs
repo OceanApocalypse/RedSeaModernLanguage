@@ -1,7 +1,7 @@
 using System;
 
 
-namespace OceanApocalypse.RSML.Toolchain.Abstractions;
+namespace OceanApocalypse.RSML.Abstractions;
 
 /// <summary>
 /// Configuration options for a <see cref="IToolchainComponent"/>.

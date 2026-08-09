@@ -1,4 +1,4 @@
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics.ErrorCodes;
+namespace OceanApocalypse.RSML.Abstractions.Diagnostics.ErrorCodes;
 
 internal static class InternalErrorCodes
 {

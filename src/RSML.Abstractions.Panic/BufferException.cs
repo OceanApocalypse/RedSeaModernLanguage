@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 
-namespace OceanApocalypse.RSML.Toolchain.Abstractions.Panic;
+namespace OceanApocalypse.RSML.Abstractions.Panic;
 
 /// <summary>
-/// An exception that occurs in <see cref="Sources.IBuffer"/> and <see cref="Sources.IBuffer"/> types.
+/// An exception that occurs in buffer types.
 /// </summary>
 public class BufferException : IOException
 {
