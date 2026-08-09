@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
 using OceanApocalypse.RSML.Language.Lexing.Tokens;
-using OceanApocalypse.RSML.Toolchain.Abstractions;
-using OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
+using OceanApocalypse.RSML.Abstractions;
+using OceanApocalypse.RSML.Abstractions.Diagnostics;
 
 
 namespace OceanApocalypse.RSML.Language.Lexing;

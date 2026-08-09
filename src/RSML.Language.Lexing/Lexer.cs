@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 
 using OceanApocalypse.RSML.Language.Lexing.Tokens;
-using OceanApocalypse.RSML.Toolchain.Abstractions;
-using OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
+using OceanApocalypse.RSML.Abstractions;
+using OceanApocalypse.RSML.Abstractions.Diagnostics;
 
 namespace OceanApocalypse.RSML.Language.Lexing;
 
@@ -25,28 +25,6 @@ public abstract class Lexer : ILexer
 		// reserved keywords - not yet implemented but blocked from being used as identifiers
 		"class", "interface"
 	];
-
-	// this should always be synced with the keywords field
-	internal static TokenKind GetKeywordTokenKind(scoped ReadOnlySpan<char> keyword) => keyword switch
-	{
-		// keywords
-		"as" => TokenKind.As,
-		"end" => TokenKind.End,
-		"if" => TokenKind.If,
-		"let" => TokenKind.Let,
-		"region" => TokenKind.Region,
-		"requires" => TokenKind.Requires,
-		"return" => TokenKind.Return,
-		"struct" => TokenKind.Struct,
-		"type" => TokenKind.Type,
-
-		// modifiers
-		"fn" => TokenKind.FunctionModifier,
-		"mut" => TokenKind.MutableModifier,
-		"previous" => TokenKind.PreviousModifier,
-
-		_ => TokenKind.Unknown,
-	};
 
 	private bool isDisposed;
 

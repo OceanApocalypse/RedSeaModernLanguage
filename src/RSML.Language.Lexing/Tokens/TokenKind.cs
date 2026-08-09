@@ -8,6 +8,11 @@ public enum TokenKind
 	/// <summary>
 	/// An unknown token kind.
 	/// </summary>
+	/// <remarks>
+	/// :::note
+	/// Unknown tokens usually lead to toolchain errors.  
+	/// :::
+	/// </remarks>
 	Unknown,
 
 	/// <summary>
@@ -23,7 +28,7 @@ public enum TokenKind
 	/// <summary>
 	/// A numeric literal.
 	/// </summary>
-	Number,
+	NumericLiteral,
 
 	/// <summary>
 	/// A string literal.
@@ -31,29 +36,29 @@ public enum TokenKind
 	StringLiteral,
 
 	/// <summary>
-	/// A built-in constant.
+	/// A built-in identifier.
 	/// </summary>
-	SystemConstant,
+	StandardLibraryIdentifier,
 
 	/// <summary>
 	/// The return keyword. Stops execution of the current scope with a given value.
 	/// </summary>
-	Return,
+	ReturnKeyword,
 
 	/// <summary>
 	/// The if keyword. Conditionalizes a statement into running only if the condition is met.
 	/// </summary>
-	If,
+	IfKeyword,
 
 	/// <summary>
 	/// The requires keyword. Indicates extensions the file depends on.
 	/// </summary>
-	Requires,
+	RequiresKeyword,
 
 	/// <summary>
 	/// The end keyword. Ends the file.
 	/// </summary>
-	End,
+	EndKeyword,
 
 	/// <summary>
 	/// The previous keyword. Modifies end into closing the previous region instead.
@@ -63,12 +68,12 @@ public enum TokenKind
 	/// <summary>
 	/// The region keyword. Creates a conditionalized region.
 	/// </summary>
-	Region,
+	RegionKeyword,
 
 	/// <summary>
 	/// The let keyword. Declares and assigns a constant.
 	/// </summary>
-	Let,
+	LetKeyword,
 
 	/// <summary>
 	/// The mut keyword. Modifies let into creating a variable instead.
@@ -81,54 +86,60 @@ public enum TokenKind
 	FunctionModifier,
 
 	/// <summary>
+	/// The exec keyword. Executes a function without you having to use discards.
+	/// Treats every function as a void function.
+	/// </summary>
+	ExecKeyword,
+
+	/// <summary>
 	/// The type keyword. Creates a type.
 	/// </summary>
-	Type,
+	TypeKeyword,
 
 	/// <summary>
 	/// The as keyword.
 	/// </summary>
-	As,
+	AsKeyword,
 
 	/// <summary>
 	/// The struct keyword. Used with type and as to create a struct type.
 	/// </summary>
-	Struct,
+	StructKeyword,
 
 	/// <summary>
 	/// The assignment operator (=).
 	/// </summary>
-	Assignment,
+	AssignmentOperator,
 
 	/// <summary>
 	/// The equality operator (==).
 	/// </summary>
-	Equality,
+	EqualToOperator,
 
 	/// <summary>
 	/// The inequality operator (!=).
 	/// </summary>
-	Inequality,
+	NotEqualToOperator,
 
 	/// <summary>
 	/// The greater-than operator (>).
 	/// </summary>
-	GreaterThan,
+	GreaterThanOperator,
 
 	/// <summary>
 	/// The less-than operator (&lt;).
 	/// </summary>
-	LessThan,
+	LessThanOperator,
 
 	/// <summary>
 	/// The greater-than-or-equal-to operator (>=).
 	/// </summary>
-	GreaterThanOrEqualTo,
+	GreaterThanOrEqualToOperator,
 
 	/// <summary>
 	/// The less-than-or-equal-to operator (&lt;=).
 	/// </summary>
-	LessThanOrEqualTo,
+	LessThanOrEqualToOperator,
 
 	/// <summary>
 	/// The colon (:).
@@ -173,7 +184,7 @@ public enum TokenKind
 	/// <summary>
 	/// The closed brace (}).
 	/// </summary>
-	CloseBrace,
+	ClosedBrace,
 
 	/// <summary>
 	/// The open parenthesis.
@@ -183,10 +194,33 @@ public enum TokenKind
 	/// <summary>
 	/// The closed parenthesis.
 	/// </summary>
-	CloseParenthesis,
+	ClosedParenthesis,
 
 	/// <summary>
 	/// The member access mark (<c>.</c>), which is a dot.
 	/// </summary>
-	MemberAccess
+	MemberAccess,
+
+	/// <summary>
+	/// The NOT operator. It swaps the boolean value of whatever
+	/// comes next.
+	/// </summary>
+	NotOperator,
+
+	/// <summary>
+	/// The logic AND operator. Returns <c>true</c> only if both the
+	/// left and right sides evaluate to <c>true</c>.
+	/// </summary>
+	LogicAndOperator,
+
+	/// <summary>
+	/// The logic OR operator. Returns <c>true</c> if either left, right
+	/// or both sides evaluate to <c>true</c>.
+	/// </summary>
+	LogicOrOperator,
+
+	/// <summary>
+	/// The at symbol (<c>@</c>). Reserved for future use.
+	/// </summary>
+	AtSymbol
 }
