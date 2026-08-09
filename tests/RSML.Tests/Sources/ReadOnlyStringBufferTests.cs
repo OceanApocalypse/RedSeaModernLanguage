@@ -1,8 +1,7 @@
 using System;
 using System.Text;
 
-using OceanApocalypse.RSML.Toolchain.Abstractions.Panic;
-using OceanApocalypse.RSML.Toolchain.Abstractions.Sources;
+using OceanApocalypse.RSML.Abstractions.Panic;
 using OceanApocalypse.RSML.Toolchain.Sources;
 
 namespace OceanApocalypse.RSML.Tests.Sources;

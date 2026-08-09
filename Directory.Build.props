@@ -4,63 +4,17 @@ Note for future self:
 - Any property defined here can be explicitly overridden in any of said projects.
 -->
 <Project>
-	<!-- XXX: Change all of these on a new version -->
-	<PropertyGroup>
-		<SemVerMajor>3</SemVerMajor> <!-- major only (e.g.: 3 for v3.0.0) -->
-		<VersionPrefix>3.0.0</VersionPrefix> <!-- major.minor.patch -->
-		<VersionSuffix>prerelease1</VersionSuffix> <!-- pre-release suffix without hyphen (beta, alpha, prereleaseX) or empty if stable -->
-		<PackageReleaseNotes>TODO</PackageReleaseNotes> <!-- release notes -->
-	</PropertyGroup>
+	<!-- Order of imports matters folks -->
+	<Import Project="$(MSBuildThisFileDirectory)props\Common.props" /> <!-- this sets things
+	NuGet.props and Versioning.props need -->
 
-	<!-- Common attributes for all projects under this solution. -->
-	<PropertyGroup>
-		<Nullable>enable</Nullable>
-		<LangVersion>14</LangVersion>
-		<Platforms>AnyCPU;ARM64;x64;x86;ARM32</Platforms>
-		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+	<!-- order of these 2 doesn't matter, but it's best to import them before the ones who depend on
+	other shit -->
+	<Import Project="$(MSBuildThisFileDirectory)props\Defaults.props" />
+	<Import Project="$(MSBuildThisFileDirectory)props\Analyzers.props" />
 
-		<!-- NuGet Package Setup -->
-		<Authors>OceanApocalypse</Authors>
-		<Company>OceanApocalypse</Company>
-		<Copyright>Copyright 2025-2026 OceanApocalypse</Copyright>
-		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-		<RepositoryType>git</RepositoryType>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<NeutralLanguage>en</NeutralLanguage>
-	</PropertyGroup>
+	<Import Project="$(MSBuildThisFileDirectory)props\Versioning.props" /> <!-- this sets things
+	NuGet.props need -->
 
-	<!-- Attributes for solution-wise code analysis. -->
-	<PropertyGroup>
-		<AnalysisLevel>latest-all</AnalysisLevel>
-		<AnalysisMode>All</AnalysisMode>
-
-		<!-- CA1016 leads to false positives after running dotnet clean (though it fixes itself on build) -->
-		<!-- CA1034 leads to false positives when using C# 14 extension members -->
-		<!-- CA1043 doesn't let us do this[Range] and this[CustomType] -->
-		<!-- CA1078 leads to false positives when using C# 14 extension members. Also, CS3001 is better for this check. -->
-		<NoWarn>$(NoWarn);CA1016;CA1034;CA1043;CA1708</NoWarn>
-	</PropertyGroup>
-
-	<!-- Don't make changes to this group. Everything is determined from data above. -->
-	<ItemGroup>
-		<AssemblyMetadata Include="SemVersion" Value="$(VersionPrefix)"
-						  Condition="'$(VersionSuffix)' == ''" />
-		<AssemblyMetadata Include="SemVersion" Value="$(VersionPrefix)-$(VersionSuffix)"
-						  Condition="'$(VersionSuffix)' != ''" />
-	</ItemGroup>
-
-	<!--
-	Don't make changes to this group.
-	This sets the GitHub Workflow Run Number environment variable if it doesn't exist.
-	This is here because local builds shouldn't break or be faulty because of an unset env var.
-	-->
-	<PropertyGroup>
-		<GITHUB_RUN_NUMBER Condition="'$(GITHUB_RUN_NUMBER)' == ''">0</GITHUB_RUN_NUMBER>
-	</PropertyGroup>
-
-	<!-- Don't make changes to this group. Everything is determined from data above. -->
-	<PropertyGroup>
-		<AssemblyVersion>$(SemVerMajor).0.0.0</AssemblyVersion>
-		<FileVersion>$(VersionPrefix).$(GITHUB_RUN_NUMBER)</FileVersion>
-	</PropertyGroup>
+	<Import Project="$(MSBuildThisFileDirectory)props\NuGet.props" />
 </Project>

@@ -1,50 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup Label="General Properties">
-		<TargetFrameworks>net10.0;net8.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<IsAotCompatible>true</IsAotCompatible>
-
 		<OutputType>Library</OutputType>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-
 		<RootNamespace>OceanApocalypse.RSML.Toolchain.Extensibility.Parsing</RootNamespace>
 	</PropertyGroup>
 
 	<PropertyGroup Label="NuGet Package Setup">
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-
 		<PackageId>OceanApocalypse.RSML.Toolchain.Extensibility.Parsing</PackageId>
 		<Title>RSML Extensible Parsers</Title>
-		<Description>The only DSL that dynamically interprets different logic paths based on an host's OS and CPU architecture.</Description>
-
-		<PackageProjectUrl>https://OceanApocalypse.org/rsml-docs/</PackageProjectUrl>
-		<PackageIcon>icon.png</PackageIcon>
-		<RepositoryUrl>https://github.com/OceanApocalypse/RedSeaModernLanguage/</RepositoryUrl>
-
-		<PackageTags>DSL;language;logic;logic-path;system;host;rsml;rsea;decision;oss</PackageTags>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
-
-	<PropertyGroup Label="Debug Build" Condition="'$(Configuration)' == 'Debug'">
-		<DebugType>full</DebugType>
-	</PropertyGroup>
-
-	<PropertyGroup Label="Release (Optimized) Build" Condition="'$(Configuration)' == 'Release'">
-		<DebugType>none</DebugType>
-		<Optimize>true</Optimize>
-	</PropertyGroup>
-
-	<ItemGroup Label="Resources">
-		<None Include="..\..\assets\icon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-			<Visible>false</Visible>
-		</None>
-		<None Include="..\..\README.md">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-			<Visible>false</Visible>
-		</None>
-	</ItemGroup>
 </Project>

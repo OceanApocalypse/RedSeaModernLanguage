@@ -1,0 +1,9 @@
+<!-- Defaults that might be overriden here and there. -->
+<Project>
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net8.0</TargetFrameworks>
+        <IsAotCompatible>true</IsAotCompatible>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+</Project>

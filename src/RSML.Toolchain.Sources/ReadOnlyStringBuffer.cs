@@ -4,10 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-using OceanApocalypse.RSML.Toolchain.Abstractions;
-using OceanApocalypse.RSML.Toolchain.Abstractions.Cache;
-using OceanApocalypse.RSML.Toolchain.Abstractions.Panic;
-using OceanApocalypse.RSML.Toolchain.Abstractions.Sources;
+using OceanApocalypse.RSML.Abstractions;
+using OceanApocalypse.RSML.Abstractions.Cache;
+using OceanApocalypse.RSML.Abstractions.Panic;
+using OceanApocalypse.RSML.Abstractions.Sources;
 
 
 namespace OceanApocalypse.RSML.Toolchain.Sources;

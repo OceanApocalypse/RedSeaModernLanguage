@@ -1,0 +1,47 @@
+# Properties set by the `.props` files in this directory
+- `Common.props`
+    - **Nullable context:** enabled
+    - **Language version:** 14
+    - **Platforms:** any CPU architecture, `arm64`, `arm`, `x64` and `x86`
+    - **Overflow/underflow checks:** enabled
+    - **Root namespace:** same as package ID, unless package ID is unset
+    - **Debug configuration**
+        - **Debug type:** full
+    - **Release configuration**
+        - **Debug type:** none
+        - **Optimizations:** enabled
+    - **Resources**
+        - **[/assets/icon.png](/assets/icon.png):** packed into package root; not visible in Solution Explorer
+        - **[/README.md](/README.md):** packed into package root; not visible in Solution Explorer
+    - **`GITHUB_RUN_NUMBER`:** 0 unless already set in the environment - meant for local build support (see `Versioning.props`)
+- `Default.props`
+    - **Target frameworks:** .NET 10.0 and .NET 8.0
+    - **AOT compatibility:** enabled
+    - **Generate documentation file on build:** yes
+- `Analyzers.props`
+    - **Analysis level:** set to `latest-all`
+    - **Analysis mode:** set to `All`
+    - **Disabled warnings:** CA1016, CA1034, CA1043 and CA1708, alongside the warnings disabled by default
+- `Versioning.props` <!-- xxx: reminder to change versions every new version -->
+    - **`SemVerMajor`** _(must be changed every new **major** version)_
+    - **`VersionPrefix`** _(must be changed every new version)_
+    - **`VersionSuffix`** _(must be changed every new version)_
+    - **`PackageReleaseNotes`** _(must be changed every new version)_
+    - **Assembly metadata:** a `SemVersion` injected into the assembly metadata, taking the `VersionPrefix` form if `VersionSuffix` is unset; otherwise, takes the form `VersionPrefix-VersionSuffix`, mimicking how `Version` is set internally by MSBuild
+    - **Assembly version:** set to `SemVerMajor.0.0.0` **always**
+    - **File version:** set to `VersionPrefix.GITHUB_RUN_NUMBER` **always**
+-  `NuGet.props`
+    - **Authors:** OceanApocalypse
+    - **Company:** OceanApocalypse
+    - **Copyright message:** Copyright 2025-2026 OceanApocalypse
+    - **Package license:** Apache 2.0
+    - **Description:** set to `The only DSL that dynamically interprets different logic paths based on an host's OS and CPU architecture.`
+    - **Repo URL:** https://github.com/OceanApocalypse/RedSeaModernLanguage/
+    - **Package project URL:** https://oceanapocalypse.org/rsml-docs/
+    - **Package tags:** set to `DSL;language;logic;logic-path;system;host;rsml;rsea;decision;oss`
+    - **Package README file:** set to previously imported `README.md` (see `Common.props`)
+    - **Package icon file:** set to previously imported `icon.png` (see `Common.props`)
+    - **Repo type:** git
+    - **Package requires license acceptance:** yes
+    - **Neutral language:** English (`en`)
+

@@ -31,6 +31,24 @@
 	</Folder>
 
 	<Folder Name="/Source/">
+		<Project Path="src/RSML.Abstractions.Diagnostics/RSML.Abstractions.Diagnostics.csproj">
+			<Platform Solution="*|ARM32" Project="ARM32" />
+			<Platform Solution="*|ARM64" Project="ARM64" />
+			<Platform Solution="*|x64" Project="x64" />
+			<Platform Solution="*|x86" Project="x86" />
+		</Project>
+		<Project Path="src/RSML.Abstractions.Panic/RSML.Abstractions.Panic.csproj">
+			<Platform Solution="*|ARM32" Project="ARM32" />
+			<Platform Solution="*|ARM64" Project="ARM64" />
+			<Platform Solution="*|x64" Project="x64" />
+			<Platform Solution="*|x86" Project="x86" />
+		</Project>
+		<Project Path="src/RSML.Abstractions/RSML.Abstractions.csproj" Id="6ec4bfa1-7021-4240-9c92-c2e4d86ebfe6">
+			<Platform Solution="*|ARM32" Project="ARM32" />
+			<Platform Solution="*|ARM64" Project="ARM64" />
+			<Platform Solution="*|x64" Project="x64" />
+			<Platform Solution="*|x86" Project="x86" />
+		</Project>
 		<Project Path="src/RSML.CLI/RSML.CLI.csproj">
 			<Platform Solution="*|ARM32" Project="ARM32" />
 			<Platform Solution="*|ARM64" Project="ARM64" />
@@ -50,12 +68,6 @@
 			<Platform Solution="*|x86" Project="x86" />
 		</Project>
 		<Project Path="src/RSML.Native/RSML.Native.csproj" Id="17353998-fb11-4f49-9921-ca0691957617">
-			<Platform Solution="*|ARM32" Project="ARM32" />
-			<Platform Solution="*|ARM64" Project="ARM64" />
-			<Platform Solution="*|x64" Project="x64" />
-			<Platform Solution="*|x86" Project="x86" />
-		</Project>
-		<Project Path="src/RSML.Toolchain.Abstractions/RSML.Toolchain.Abstractions.csproj" Id="6ec4bfa1-7021-4240-9c92-c2e4d86ebfe6">
 			<Platform Solution="*|ARM32" Project="ARM32" />
 			<Platform Solution="*|ARM64" Project="ARM64" />
 			<Platform Solution="*|x64" Project="x64" />

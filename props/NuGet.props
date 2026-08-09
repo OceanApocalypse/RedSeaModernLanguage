@@ -1,0 +1,23 @@
+<Project>
+    <PropertyGroup>
+        <Authors>OceanApocalypse</Authors>
+        <Company>OceanApocalypse</Company>
+        <Copyright>Copyright 2025-2026 OceanApocalypse</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+        <Description>The only DSL that dynamically interprets different logic paths based on an
+            host's OS and CPU architecture.</Description>
+
+        <RepositoryUrl>https://github.com/OceanApocalypse/RedSeaModernLanguage/</RepositoryUrl>
+        <PackageProjectUrl>https://oceanapocalypse.org/rsml-docs/</PackageProjectUrl>
+
+        <PackageTags>DSL;language;logic;logic-path;system;host;rsml;rsea;decision;oss</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
+
+        <RepositoryType>git</RepositoryType>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <NeutralLanguage>en</NeutralLanguage>
+    </PropertyGroup>
+</Project>
+    
