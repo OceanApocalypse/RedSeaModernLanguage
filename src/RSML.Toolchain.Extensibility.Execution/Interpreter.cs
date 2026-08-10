@@ -1,6 +1,7 @@
 using System;
 
 using OceanApocalypse.RSML.Abstractions;
+using OceanApocalypse.RSML.Abstractions.Toolchain;
 
 namespace OceanApocalypse.RSML.Toolchain.Extensibility.Execution;
 
@@ -9,7 +10,8 @@ namespace OceanApocalypse.RSML.Toolchain.Extensibility.Execution;
 /// </summary>
 public abstract class Interpreter : IToolchainComponent
 {
-	// todo: add necessary content to IInterpreter
+	// todo: make this implement IToolchainComponent correctly
+
 	private bool isDisposed;
 
 	/// <inheritdoc/>

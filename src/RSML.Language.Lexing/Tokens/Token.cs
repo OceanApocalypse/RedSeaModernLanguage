@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace OceanApocalypse.RSML.Language.Lexing.Tokens;
 
@@ -8,14 +9,15 @@ namespace OceanApocalypse.RSML.Language.Lexing.Tokens;
 /// Represents a RSML token.
 /// </summary>
 /// <param name="Kind">An integer that identifies the type of token.</param>
-/// <param name="Value">The token's value.</param>
-/// <param name="Range">The range where the token occurs.</param>
-public record struct Token(TokenKind Kind, object? Value, Range Range)
+/// <param name="StartOffset">The offset at which the token begins.</param>
+/// <param name="Length">The token's length.</param>
+[StructLayout(LayoutKind.Sequential)]
+public record struct Token(TokenKind Kind, long StartOffset, long Length)
 {
 	/// <summary>
 	/// Empty token. Used when something goes wrong.
 	/// </summary>
-	public readonly static Token Empty = new(TokenKind.Unknown, null, new());
+	public readonly static Token Empty = new(TokenKind.Unknown, 0L, 0L);
 
 	/// <summary>
 	/// Gets the token kind that applies to the given keyword or keyword modifier.

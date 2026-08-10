@@ -1,8 +1,10 @@
+using System;
+using System.Buffers;
 using System.Collections.Generic;
 
-using OceanApocalypse.RSML.Language.Lexing.Tokens;
-using OceanApocalypse.RSML.Abstractions;
 using OceanApocalypse.RSML.Abstractions.Diagnostics;
+using OceanApocalypse.RSML.Abstractions.Toolchain;
+using OceanApocalypse.RSML.Language.Lexing.Tokens;
 
 
 namespace OceanApocalypse.RSML.Language.Lexing;
@@ -10,24 +12,18 @@ namespace OceanApocalypse.RSML.Language.Lexing;
 /// <summary>
 /// Represents a lexer for RSML.
 /// </summary>
-/// <remarks>
-/// :::tip[Avoid starting from scratch]
-/// If you want to add content on top of a lexer, without overriding
-/// the extra functionality it adds, you might want to take a look at
-/// <see cref="Lexer"/>.
-/// :::
-/// </remarks>
-public interface ILexer : IToolchainComponent
+public interface ILexer<TInput> : IToolchainComponent
+	where TInput : unmanaged, IEquatable<TInput>
 {
 	/// <summary>
 	/// Tokenizes a source passed to the lexer.
 	/// </summary>
 	/// <returns>The tokens.</returns>
-	IEnumerable<Token> Lex();
+	IEnumerable<Token> Lex(ReadOnlySequence<TInput> data);
 
 	/// <summary>
 	/// Returns the next token.
 	/// </summary>
 	/// <returns>The next token.</returns>
-	Result<Token> GetNextToken();
+	Result<Token> GetNextToken(ref SequenceReader<TInput> reader);
 }

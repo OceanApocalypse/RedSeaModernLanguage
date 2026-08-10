@@ -9,6 +9,8 @@ namespace OceanApocalypse.RSML.Language.Parsing;
 /// </summary>
 public abstract class Parser : IParser
 {
+	// todo: make this implement IParser correctly
+
 	private bool isDisposed;
 
 	/// <inheritdoc/>
