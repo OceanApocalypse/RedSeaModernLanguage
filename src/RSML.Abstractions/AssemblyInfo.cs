@@ -13,4 +13,3 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 [assembly: CLSCompliant(true)]
-[assembly: InternalsVisibleTo("RSML.Toolchain.Sources")]

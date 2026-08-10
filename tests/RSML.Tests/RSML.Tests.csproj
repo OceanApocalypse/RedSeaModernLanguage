@@ -23,7 +23,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\RSML.Abstractions\RSML.Abstractions.csproj" />
-		<ProjectReference Include="..\..\src\RSML.Toolchain.Sources\RSML.Toolchain.Sources.csproj" />
 		<ProjectReference Include="..\..\src\RSML.Abstractions.Panic\RSML.Abstractions.Panic.csproj" />
 	</ItemGroup>
 

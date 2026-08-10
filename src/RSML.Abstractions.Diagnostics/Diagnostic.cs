@@ -43,7 +43,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 	/// <param name="code">The error code.</param>
 	public Diagnostic(string code)
 	{
-		ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
+		ArgumentException.ThrowIfNullOrWhiteSpace(code);
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
@@ -56,7 +56,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 	/// <param name="message">A brief error message detailing why it has happened.</param>
 	public Diagnostic(string code, string message)
 	{
-		ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
+		ArgumentException.ThrowIfNullOrWhiteSpace(code);
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
@@ -69,7 +69,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 	/// <param name="severity">The error's severity.</param>
 	public Diagnostic(string code, Severity severity)
 	{
-		ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
+		ArgumentException.ThrowIfNullOrWhiteSpace(code);
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
@@ -83,7 +83,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 	/// <param name="severity">The error's severity.</param>
 	public Diagnostic(string code, string message, Severity severity)
 	{
-		ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
+		ArgumentException.ThrowIfNullOrWhiteSpace(code);
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;
@@ -99,7 +99,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 	/// <param name="severity">The error's severity.</param>
 	public Diagnostic(string code, (Index idx, int line, int col) spanStart, (Index idx, int line, int col) spanEnd, string message, Severity severity)
 	{
-		ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
+		ArgumentException.ThrowIfNullOrWhiteSpace(code);
 		ThrowIfInvalidErrorCode(code);
 
 		Code = code;

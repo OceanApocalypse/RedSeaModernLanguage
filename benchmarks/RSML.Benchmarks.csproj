@@ -17,6 +17,5 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\src\RSML.Abstractions\RSML.Abstractions.csproj" />
-		<ProjectReference Include="..\src\RSML.Toolchain.Sources\RSML.Toolchain.Sources.csproj" />
 	</ItemGroup>
 </Project>

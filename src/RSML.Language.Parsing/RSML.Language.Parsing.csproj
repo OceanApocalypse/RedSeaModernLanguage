@@ -13,6 +13,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\RSML.Abstractions.Toolchain\RSML.Abstractions.Toolchain.csproj" />
 		<ProjectReference Include="..\RSML.Abstractions\RSML.Abstractions.csproj" />
 	</ItemGroup>
 </Project>
