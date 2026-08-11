@@ -1,29 +1,24 @@
-using System;
-using System.Buffers;
 using System.Collections.Generic;
 
-using OceanApocalypse.RSML.Abstractions.Diagnostics;
 using OceanApocalypse.RSML.Abstractions.Toolchain;
 using OceanApocalypse.RSML.Language.Lexing.Tokens;
-
 
 namespace OceanApocalypse.RSML.Language.Lexing;
 
 /// <summary>
-/// Represents a lexer for RSML.
+/// Represents a lexer tasked with tokenizing RSML code.
 /// </summary>
-public interface ILexer<TInput> : IToolchainComponent
-	where TInput : unmanaged, IEquatable<TInput>
+public interface ILexer : IToolchainComponent
 {
-	/// <summary>
-	/// Tokenizes a source passed to the lexer.
+    /// <summary>
+	/// Tokenizes a string passed to the lexer.
 	/// </summary>
 	/// <returns>The tokens.</returns>
-	IEnumerable<Token> Lex(ReadOnlySequence<TInput> data);
+	IEnumerable<Token> Lex(string? data);
 
-	/// <summary>
-	/// Returns the next token.
+    /// <summary>
+	/// Tokenizes an array of characters passed to the lexer.
 	/// </summary>
-	/// <returns>The next token.</returns>
-	Result<Token> GetNextToken(ref SequenceReader<TInput> reader);
+	/// <returns>The tokens.</returns>
+	IEnumerable<Token> Lex(char[] data);
 }

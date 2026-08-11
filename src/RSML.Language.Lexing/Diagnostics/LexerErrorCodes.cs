@@ -8,4 +8,5 @@ internal static class LexerErrorCodes
 	public const string FailedToIdentifyKeyword = "RL0003";
 	public const string FailedToIdentifyPunctuation = "RL0004";
 	public const string ExpectedStdIdentifier = "RL0005";
+	public const string InvalidData = "RL0006";
 }

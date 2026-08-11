@@ -68,6 +68,13 @@ public static class Extensions
 		/// <returns>True if the character is an ASCII digit.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool IsAsciiDigit() => item is >= 48 and <= 57; // 48 is '0' and 57 is '9'
+
+		/// <summary>
+		/// Checks if a given character falls under the ASCII category.
+		/// </summary>
+		/// <returns>True if the character is ASCII.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool IsAscii() => item is > 127;
 	}
 
 	extension(IImmutableList<string> strings)
