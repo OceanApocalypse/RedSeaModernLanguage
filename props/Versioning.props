@@ -1,0 +1,25 @@
+<!-- Properties related to RSML versioning. -->
+<Project>
+    <!-- XXX: Change all of these on a new version -->
+    <PropertyGroup Label="Versioning Data">
+        <SemVerMajor>3</SemVerMajor> <!-- major only (e.g.: 3 for v3.0.0) -->
+        <VersionPrefix>3.0.0</VersionPrefix> <!-- major.minor.patch -->
+        <VersionSuffix>prerelease1</VersionSuffix> <!-- pre-release suffix without hyphen (beta,
+        alpha, prereleaseX) or empty if stable -->
+        <PackageReleaseNotes>TODO</PackageReleaseNotes> <!-- release notes -->
+    </PropertyGroup>
+
+    <!-- Don't make changes to this group. Everything is determined from data above. -->
+    <ItemGroup>
+        <AssemblyMetadata Include="SemVersion" Value="$(VersionPrefix)"
+            Condition="'$(VersionSuffix)' == ''" />
+        <AssemblyMetadata Include="SemVersion" Value="$(VersionPrefix)-$(VersionSuffix)"
+            Condition="'$(VersionSuffix)' != ''" />
+    </ItemGroup>
+
+    <!-- Don't make changes to this group. Everything is determined from data above. -->
+    <PropertyGroup>
+        <AssemblyVersion>$(SemVerMajor).0.0.0</AssemblyVersion>
+        <FileVersion>$(VersionPrefix).$(GITHUB_RUN_NUMBER)</FileVersion>
+    </PropertyGroup>
+</Project>

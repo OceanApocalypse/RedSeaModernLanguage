@@ -1,5 +1,5 @@
 {
-  "sonarCloudOrganization": "oas",
-  "region": "EU",
-  "projectKey": "oas_RedSeaModernLanguage"
+    "sonarCloudOrganization": "oas",
+    "projectKey": "oas_RedSeaModernLanguage",
+    "region": "EU"
 }

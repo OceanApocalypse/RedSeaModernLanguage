@@ -1,0 +1,36 @@
+<!-- Properties that are common to all RSML projects. -->
+<Project>
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <Platforms>AnyCPU;ARM64;x64;x86;ARM32</Platforms>
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+
+        <RootNamespace Condition="'$(PackageId)' != ''">$(PackageId)</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Debug Build" Condition="'$(Configuration)' == 'Debug'">
+        <DebugType>full</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Release (Optimized) Build" Condition="'$(Configuration)' == 'Release'">
+        <DebugType>none</DebugType>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup Label="Resources">
+        <None Include="$(MSBuildThisFileDirectory)..\assets\icon.png" Pack="true" PackagePath="\"
+            Visible="false" />
+        <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="\"
+            Visible="false" />
+    </ItemGroup>
+
+    <!--
+	Don't make changes to this group.
+	This sets the GitHub Workflow Run Number environment variable if it doesn't exist.
+	This is here because local builds shouldn't break or be faulty because of an unset env var.
+	-->
+    <PropertyGroup>
+        <GITHUB_RUN_NUMBER Condition="'$(GITHUB_RUN_NUMBER)' == ''">0</GITHUB_RUN_NUMBER>
+    </PropertyGroup>
+</Project>

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Label="General Properties">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<OutputType>Library</OutputType>
+		<RootNamespace>OceanApocalypse.RSML.Abstractions.Toolchain</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup Label="NuGet Package Setup">
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageId>OceanApocalypse.RSML.Abstractions.Toolchain</PackageId>
+		<Title>RSML Toolchain Abstractions</Title>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\RSML.Abstractions.Panic\RSML.Abstractions.Panic.csproj" />
+		<ProjectReference
+			Include="..\RSML.Abstractions.Diagnostics\RSML.Abstractions.Diagnostics.csproj" />
+	</ItemGroup>
+</Project>

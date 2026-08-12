@@ -2,13 +2,10 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<Nullable>enable</Nullable>
 		<OutputType>Exe</OutputType>
 		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
 		<RootNamespace>OceanApocalypse.RSML.Tests.Internal</RootNamespace>
-		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Platforms>AnyCPU;ARM64;x64;x86;ARM32</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>

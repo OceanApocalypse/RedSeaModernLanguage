@@ -1,6 +1,6 @@
 using System;
 
-using OceanApocalypse.RSML.Toolchain.Abstractions;
+using OceanApocalypse.RSML.Abstractions.Toolchain;
 
 namespace OceanApocalypse.RSML.Language.Parsing;
 
@@ -9,10 +9,12 @@ namespace OceanApocalypse.RSML.Language.Parsing;
 /// </summary>
 public abstract class Parser : IParser
 {
+	// todo: make this implement IParser correctly
+
 	private bool isDisposed;
 
 	/// <inheritdoc/>
-	public ToolchainConfigurations Configuration { get; protected set; }
+	ToolchainConfiguration IToolchainComponent.Configuration => throw new NotImplementedException();
 
 	/// <inheritdoc/>
 	public void Dispose()
@@ -22,7 +24,7 @@ public abstract class Parser : IParser
 	}
 
 	/// <inheritdoc/>
-	public virtual void Inject(ToolchainConfigurations configuration) => throw new NotImplementedException();
+	public void Inject(ToolchainConfiguration configuration) => throw new NotImplementedException();
 
 	/// <summary>
 	/// Disposes of both managed and unmanaged resources.

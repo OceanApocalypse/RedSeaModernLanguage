@@ -1,33 +1,24 @@
 using System.Collections.Generic;
 
+using OceanApocalypse.RSML.Abstractions.Toolchain;
 using OceanApocalypse.RSML.Language.Lexing.Tokens;
-using OceanApocalypse.RSML.Toolchain.Abstractions;
-using OceanApocalypse.RSML.Toolchain.Abstractions.Diagnostics;
-
 
 namespace OceanApocalypse.RSML.Language.Lexing;
 
 /// <summary>
-/// Represents a lexer for RSML.
+/// Represents a lexer tasked with tokenizing RSML code.
 /// </summary>
-/// <remarks>
-/// :::tip[Avoid starting from scratch]
-/// If you want to add content on top of a lexer, without overriding
-/// the extra functionality it adds, you might want to take a look at
-/// <see cref="Lexer"/>.
-/// :::
-/// </remarks>
 public interface ILexer : IToolchainComponent
 {
-	/// <summary>
-	/// Tokenizes a source passed to the lexer.
+    /// <summary>
+	/// Tokenizes a string passed to the lexer.
 	/// </summary>
 	/// <returns>The tokens.</returns>
-	IEnumerable<Token> Lex();
+	IEnumerable<Token> Lex(string? data);
 
-	/// <summary>
-	/// Returns the next token.
+    /// <summary>
+	/// Tokenizes an array of characters passed to the lexer.
 	/// </summary>
-	/// <returns>The next token.</returns>
-	Result<Token> GetNextToken();
+	/// <returns>The tokens.</returns>
+	IEnumerable<Token> Lex(char[] data);
 }
