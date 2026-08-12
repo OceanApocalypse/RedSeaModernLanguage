@@ -117,7 +117,7 @@
 		</Project>
 	</Folder>
 
-    <Folder Name="/Source/Benchmarks/">
+	<Folder Name="/Benchmarks/">
     	<Project Path="benchmarks/RSML.Benchmarks.csproj">
     		<Platform Solution="*|ARM32" Project="ARM32" />
     		<Platform Solution="*|ARM64" Project="ARM64" />
@@ -126,8 +126,14 @@
     	</Project>
     </Folder>
 
-	<Folder Name="/Source/Tests/">
+	<Folder Name="/Tests/">
 		<File Path="tests/Directory.Build.props" />
+		<Project Path="tests/language/RSML.Language.Tests.csproj">
+			<Platform Solution="*|ARM32" Project="ARM32" />
+			<Platform Solution="*|ARM64" Project="ARM64" />
+			<Platform Solution="*|x64" Project="x64" />
+			<Platform Solution="*|x86" Project="x86" />
+		</Project>
 		<Project Path="tests/RSML.InternalTests/RSML.InternalTests.csproj" Id="bcf74754-66fd-40c5-9faa-6d803d66467f">
 			<Platform Solution="*|ARM32" Project="ARM32" />
 			<Platform Solution="*|ARM64" Project="ARM64" />
