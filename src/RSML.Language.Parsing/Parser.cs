@@ -24,6 +24,9 @@ public abstract class Parser : IParser
 	}
 
 	/// <inheritdoc/>
+	public void Freeze() => throw new NotImplementedException();
+
+	/// <inheritdoc/>
 	public void Inject(ToolchainConfiguration configuration) => throw new NotImplementedException();
 
 	/// <summary>

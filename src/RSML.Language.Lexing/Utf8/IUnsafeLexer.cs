@@ -8,7 +8,7 @@ namespace OceanApocalypse.RSML.Language.Lexing.Utf8;
 /// Represents a lexer with attributes or methods that utilize the unsafe context.
 /// </summary>
 [CLSCompliant(false)]
-public unsafe interface IUnsafeLexer : ILexer
+public unsafe interface IUnsafeLexer : IUtf8Lexer
 {
     /// <summary>
 	/// Tokenizes an array of bytes passed to the lexer, with UTF-8 encoding.

@@ -6,6 +6,8 @@ namespace OceanApocalypse.RSML.CLI;
 
 internal sealed class Program
 {
+	private Program() { }
+
 	private static void Main(string[] args)
 	{
 		// todo: implement

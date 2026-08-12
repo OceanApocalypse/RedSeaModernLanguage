@@ -21,7 +21,7 @@ namespace OceanApocalypse.RSML.Language.Lexing.Utf8;
 /// </remarks>
 /// <param name="diagnosticCollector">A collector with all the diagnostics that were and will be emitted.</param>
 /// <param name="configuration">Configurations for the toolchain components.</param>
-public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfiguration? configuration = null) : IUtf8Lexer<byte>
+public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfiguration? configuration = null) : IUtf8Lexer
 {
 	private bool isDisposed;
 	private bool wasUsed;
@@ -415,4 +415,7 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		ArgumentNullException.ThrowIfNull(data);
 		return Lex(new ReadOnlySequence<byte>(Encoding.Default.GetBytes(data)));
 	}
+
+	/// <inheritdoc/>
+	public void Freeze() => wasUsed = true;
 }

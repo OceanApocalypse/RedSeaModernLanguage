@@ -17,4 +17,9 @@ public interface IToolchainComponent : IDisposable
 	/// </summary>
 	/// <param name="configuration">The configuration to inject.</param>
 	void Inject(ToolchainConfiguration configuration);
+
+	/// <summary>
+	/// Freezes the current configuration, preventing any modifications to it.
+	/// </summary>
+	void Freeze();
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Buffers;
 using System.Collections.Generic;
 
@@ -11,14 +10,13 @@ namespace OceanApocalypse.RSML.Language.Lexing.Utf8;
 /// <summary>
 /// Represents a UTF-8 lexer for RSML.
 /// </summary>
-public interface IUtf8Lexer<TInput> : ILexer
-	where TInput : unmanaged, IEquatable<TInput>
+public interface IUtf8Lexer : ILexer
 {
 	/// <summary>
 	/// Tokenizes a source passed to the lexer.
 	/// </summary>
 	/// <returns>The tokens.</returns>
-	IEnumerable<Token> Lex(ReadOnlySequence<TInput> data);
+	IEnumerable<Token> Lex(ReadOnlySequence<byte> data);
 
 	/// <summary>
 	/// Returns the next token.
@@ -26,5 +24,5 @@ public interface IUtf8Lexer<TInput> : ILexer
 	/// <param name="reader">The reader whose data to read.</param>
 	/// <param name="currentPosition">The current expected position.</param> 
 	/// <returns>The next token.</returns>
-	Result<Token> GetNextToken(ref SequenceReader<TInput> reader, ref AbsolutePosition currentPosition);
+	Result<Token> GetNextToken(ref SequenceReader<byte> reader, ref AbsolutePosition currentPosition);
 }
