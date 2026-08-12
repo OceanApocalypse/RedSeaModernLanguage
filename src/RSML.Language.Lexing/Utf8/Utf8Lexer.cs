@@ -47,18 +47,17 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		wasUsed = true;
 		AbsolutePosition.ThrowIfInvalid(currentPosition);
 
-		var startLoc = reader.Consumed;
-		SkipWhitespaceAndComments(ref reader);
+		SkipWhitespaceAndComments(ref reader, ref currentPosition);
 
 		if (reader.End || !reader.TryPeek(out byte b))
-			return Result.Success(new Token(TokenKind.Eof, startLoc, startLoc));
+			return Result.Success(new Token(TokenKind.Eof, reader.Consumed, reader.Consumed));
 
 		if (!b.IsAscii())
 		{
 			return Result.Failure<Token>(new(
 				LexerErrorCodes.InvalidData,
-				startLoc, currentPosition,
-				startLoc, currentPosition,
+				reader.Consumed, currentPosition,
+				reader.Consumed, currentPosition,
 				"Expected an ASCII character but received a non-ASCII character.",
 				Severity.Error
 			));
@@ -68,33 +67,35 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 
 		// strings
 		if (c == '"')
-			return ScanStringLiteral(ref reader, startLoc, ref currentPosition);
+			return ScanStringLiteral(ref reader, ref currentPosition);
 
 		// number literals
 		if (b.IsAsciiDigit())
-			return ScanNumber(ref reader, startChar: b, startLoc, ref currentPosition);
+			return ScanNumber(ref reader, startChar: b, ref currentPosition);
 
 		// identifiers and keywords
 		if (b.IsAsciiLetter() || c == '_')
-			return ScanIdentifierOrKeyword(ref reader, startLoc, ref currentPosition);
+			return ScanIdentifierOrKeyword(ref reader, ref currentPosition);
 
 		// standard library identifiers
 		if (c == '$')
-			return ScanStdIdentifier(ref reader, startLoc, ref currentPosition);
+			return ScanStdIdentifier(ref reader, ref currentPosition);
 
 		// member access notation
 		if (c == '.')
 		{
 			reader.Advance(1);
 			currentPosition.Column++;
-			return Result.Success(new Token(TokenKind.MemberAccess, startLoc, 1));
+			return Result.Success(new Token(TokenKind.MemberAccess, reader.Consumed, 1));
 		}
 
 		// punctuation
 		if (b.IsRsmlPunctuation())
-			return ScanPunctuation(ref reader, startLoc, ref currentPosition);
+			return ScanPunctuation(ref reader, ref currentPosition);
 
-		// todo: check for comments if Configuration.EmitComments is enabled
+		// comments
+		if (Configuration.EmitComments && b == (byte)'#')
+			return ScanComment(ref reader, ref currentPosition);
 
 		return Result.Failure<Token>(new(
 			code: LexerErrorCodes.FailedToLexToken,
@@ -112,6 +113,7 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 
 		var reader = new SequenceReader<byte>(data);
 		var position = AbsolutePosition.Default;
+		var writer = new ArrayBufferWriter<Token>((int)(data.Length / 2));
 
 		if (!position.IsValid)
 		{
@@ -121,20 +123,33 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 
 		while (Configuration.MaximumAllowedFailuresPerComponent <= 0 || failedRuns < Configuration.MaximumAllowedFailuresPerComponent)
 		{
-			var token = GetNextToken(ref reader, ref position);
+			Span<Token> tokens = writer.GetSpan(64);
+			int idx = 0;
 
-			if (token.IsError)
+			while (idx < tokens.Length && Configuration.MaximumAllowedFailuresPerComponent <= 0 || failedRuns < Configuration.MaximumAllowedFailuresPerComponent)
 			{
-				Diagnostics.Add(token.Error);
-				failedRuns++;
-				continue;
+				var token = GetNextToken(ref reader, ref position);
+
+				if (token.IsError)
+				{
+					Diagnostics.Add(token.Error);
+					failedRuns++;
+					continue;
+				}
+
+				if (token.Value.Kind == TokenKind.Eof)
+				{
+					return writer.WrittenSpan.ToArray();
+				}
+
+				else
+				{
+					tokens[idx] = token.Value;
+					idx++;
+				}
 			}
 
-			if (token.Value.Kind == TokenKind.Eof)
-				yield break;
-
-			else
-				yield return token.Value;
+			writer.Advance(idx);
 		}
 
 		throw new ExceededMaxAmountOfFailuresException(
@@ -142,9 +157,10 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		);
 	}
 
-	private static Result<Token> ScanNumber(ref SequenceReader<byte> reader, byte startChar, long startLoc, ref AbsolutePosition position)
+	private static Result<Token> ScanNumber(ref SequenceReader<byte> reader, byte startChar, ref AbsolutePosition position)
 	{
 		var startPos = position;
+		var startLoc = reader.Consumed;
 
 		byte b = startChar;
 		bool hasDotSeparator = false;
@@ -173,9 +189,10 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		return Result.Success(new Token(TokenKind.NumericLiteral, startLoc, reader.Consumed - startLoc));
 	}
 
-	private static Result<Token> ScanStringLiteral(ref SequenceReader<byte> reader, long startLoc, ref AbsolutePosition position)
+	private static Result<Token> ScanStringLiteral(ref SequenceReader<byte> reader, ref AbsolutePosition position)
 	{
 		var startPos = position;
+		var startLoc = reader.Consumed;
 		bool escaping = false;
 
 		if (reader.End)
@@ -220,9 +237,10 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		return Result.Success(new Token(TokenKind.StringLiteral, startLoc, reader.Consumed - startLoc));
 	}
 
-	private static Result<Token> ScanStdIdentifier(ref SequenceReader<byte> reader, long startLoc, ref AbsolutePosition position)
+	private static Result<Token> ScanStdIdentifier(ref SequenceReader<byte> reader, ref AbsolutePosition position)
 	{
-		AbsolutePosition startPos = position;
+		var startPos = position;
+		var startLoc = reader.Consumed;
 
 		do
 		{
@@ -242,9 +260,10 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 			: Result.Success(new Token(TokenKind.StandardLibraryIdentifier, startLoc, reader.Consumed - startLoc));
 	}
 
-	private static Result<Token> ScanIdentifierOrKeyword(ref SequenceReader<byte> reader, long startLoc, ref AbsolutePosition position)
+	private static Result<Token> ScanIdentifierOrKeyword(ref SequenceReader<byte> reader, ref AbsolutePosition position)
 	{
 		var startPos = position;
+		var startLoc = reader.Consumed;
 
 		while (!reader.End && reader.TryPeek(out byte b) && (b.IsAsciiLetter() || b.IsAsciiDigit() || b == '_'))
 		{
@@ -276,9 +295,10 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		}
 	}
 
-	private static Result<Token> ScanPunctuation(ref SequenceReader<byte> reader, long startLoc, ref AbsolutePosition position)
+	private static Result<Token> ScanPunctuation(ref SequenceReader<byte> reader, ref AbsolutePosition position)
 	{
 		var startPos = position;
+		var startLoc = reader.Consumed;
 
 		reader.TryRead(out byte first); // will always work and will always be ASCII
 		position.Column++;
@@ -308,18 +328,44 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 			: Result.Success(new Token(kind, startLoc, reader.Consumed - startLoc));
 	}
 
-	private void SkipWhitespaceAndComments(ref SequenceReader<byte> reader)
+	private static Result<Token> ScanComment(ref SequenceReader<byte> reader, ref AbsolutePosition position)
+	{
+		var startLoc = reader.Consumed;
+		var found = reader.TryAdvanceToAny([(byte)'\r', (byte)'\n'], advancePastDelimiter: false);
+		// not advancing past cuz it gets handled in next GetNextToken call
+
+		if (!found) // consume everything - we're EOF
+			reader.AdvanceToEnd();
+
+		int tokenLength = (int)(reader.Consumed - startLoc);
+		position.Column += tokenLength;
+		return Result.Success(new Token(TokenKind.Comment, startLoc, tokenLength));
+	}
+
+	private void SkipWhitespaceAndComments(ref SequenceReader<byte> reader, ref AbsolutePosition position)
 	{
 		while (!reader.End && reader.TryPeek(out byte b))
 		{
-			if (b.IsAsciiWhitespace())
+			if (b.IsAsciiNewline())
+			{
 				reader.Advance(1);
+				position.MoveToStartOfNextLine();
 
+				if (b == (byte)'\r' && reader.TryPeek(out byte next) && next == (byte)'\n')
+					reader.Advance(1);
+			}
+			else if (b.IsAsciiWhitespace())
+			{
+				position.Column += (int)reader.AdvancePastAny([9, 11, 12, 30]);
+			}
 			else if (b == (byte)'#' && !Configuration.EmitComments)
-				reader.TryAdvanceToAny([(byte)'\r', (byte)'\n'], advancePastDelimiter: true);
-
+			{
+				_ = ScanComment(ref reader, ref position);
+			}
 			else
+			{
 				break;
+			}
 		}
 	}
 

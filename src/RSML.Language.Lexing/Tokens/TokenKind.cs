@@ -222,5 +222,10 @@ public enum TokenKind
 	/// <summary>
 	/// The at symbol (<c>@</c>). Reserved for future use.
 	/// </summary>
-	AtSymbol
+	AtSymbol,
+
+	/// <summary>
+	/// A comment, including the # symbol.
+	/// </summary>
+	Comment
 }
