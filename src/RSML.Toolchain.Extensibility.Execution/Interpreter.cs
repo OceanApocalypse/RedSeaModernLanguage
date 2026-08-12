@@ -1,6 +1,5 @@
 using System;
 
-using OceanApocalypse.RSML.Abstractions;
 using OceanApocalypse.RSML.Abstractions.Toolchain;
 
 namespace OceanApocalypse.RSML.Toolchain.Extensibility.Execution;
@@ -18,7 +17,7 @@ public abstract class Interpreter : IToolchainComponent
 	public bool IsMutable { get; protected set; } = true;
 
 	/// <inheritdoc/>
-	public ToolchainConfigurations Configuration { get; protected set; }
+	ToolchainConfiguration IToolchainComponent.Configuration => throw new NotImplementedException();
 
 	/// <inheritdoc/>
 	public void Dispose()
@@ -31,7 +30,7 @@ public abstract class Interpreter : IToolchainComponent
 	public void Freeze() => IsMutable = false;
 
 	/// <inheritdoc/>
-	public void Inject(ToolchainConfigurations configuration) => throw new NotImplementedException();
+	public void Inject(ToolchainConfiguration configuration) => throw new NotImplementedException();
 
 	/// <summary>
 	/// Disposes of both managed and unmanaged resources.

@@ -1,6 +1,8 @@
 using System;
-using System.Collections.Immutable;
+using System.Buffers;
+using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace OceanApocalypse.RSML.Abstractions;
 
@@ -9,6 +11,7 @@ namespace OceanApocalypse.RSML.Abstractions;
 /// </summary>
 public static class Extensions
 {
+	private readonly static UTF8Encoding exceptionlessUtf8Encoding = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
 	private const byte UpperLowerDiffBit = 0b_0010_0000; // 0x20, binary seems best suited for this tho ngl
 
 	#region ASCII Characters
@@ -77,23 +80,69 @@ public static class Extensions
 		public bool IsAscii() => item is > 127;
 	}
 
-	extension(IImmutableList<string> strings)
+	extension(ReadOnlySequence<byte> sequence)
 	{
 		/// <summary>
-		/// Checks if an immutable array of strings contains a given character span.
+		/// Safely decodes a UTF-8 sequence to a UTF-16 character span.
 		/// </summary>
-		/// <param name="span">The span to check for.</param>
-		/// <param name="comparisonType">The comparison mode to apply.</param>
-		/// <returns>True if found.</returns>
-		public bool Contains(ReadOnlySpan<char> span, StringComparison comparisonType = StringComparison.Ordinal)
+		/// <param name="destination">The destination span.</param>
+		/// <param name="encoding">The UTF-8 encoding to use.</param>
+		/// <returns>The amount of characters written.</returns>
+		public int SafelyDecodeToCharacterSpan(Span<char> destination, UTF8Encoding? encoding = null)
 		{
-			foreach (string @string in strings)
+			int totalCharsWritten = 0;
+			Decoder decoder = (encoding ?? exceptionlessUtf8Encoding).GetDecoder();
+
+			foreach (var segment in sequence)
 			{
-				if (!span.Equals(@string, comparisonType))
-					return false;
+				ReadOnlySpan<byte> span = segment.Span;
+				decoder.Convert(span, destination[totalCharsWritten..], false, out _, out int charsWritten, out _);
+				totalCharsWritten += charsWritten;
 			}
 
-			return true;
+			decoder.Convert([], destination[totalCharsWritten..], true, out _, out int flushCharsWritten, out _);
+			totalCharsWritten += flushCharsWritten;
+			return totalCharsWritten;
+		}
+	}
+
+	extension(FrozenSet<string> stringSet)
+	{
+		/// <summary>
+		/// Checks if an immutable array of UTF-16 strings contains a given UTF-8 span.
+		/// </summary>
+		/// <param name="seq">The span to check for.</param>
+		/// <param name="stackAllocThreshold">The threshold that, when exceeded, ensures the code falls back to using arrays to avoid overflows.</param>
+		/// <returns>True if found.</returns>
+		public bool ContainsUtf8(ReadOnlySequence<byte> seq, int stackAllocThreshold = 256)
+		{
+			if (stringSet.Count == 0 || seq.IsEmpty)
+				return false; // we fail fast over here
+
+			var lookup = stringSet.GetAlternateLookup<ReadOnlySpan<char>>(); // lookup spans, not strings to avoid heap allocs obviously
+			long length = seq.Length;
+
+			if (length <= stackAllocThreshold) // the seq is small, we can use a span directly :)
+			{
+				Span<char> charBuffer = stackalloc char[(int)length];
+				int charsWritten = seq.SafelyDecodeToCharacterSpan(charBuffer, exceptionlessUtf8Encoding);
+				return lookup.Contains(charBuffer[..charsWritten]); // make sure to slice to avoid reading garbage data broski
+			}
+			else
+			{
+				char[] pooledArray = ArrayPool<char>.Shared.Rent((int)length); // we poolin' over here (direct span would be stack overflow)
+
+				try
+				{
+					Span<char> charBuffer = pooledArray.AsSpan(0, (int)length); // get a span out of it, dum dum (we limit to length because sometimes it might pool larger arrays)
+					int charsWritten = seq.SafelyDecodeToCharacterSpan(charBuffer, exceptionlessUtf8Encoding);
+					return lookup.Contains(charBuffer[..charsWritten]); // make sure to slice to avoid reading garbage data brosquito
+				}
+				finally
+				{
+					ArrayPool<char>.Shared.Return(pooledArray); // we return to avoid leaking
+				}
+			}
 		}
 	}
 }

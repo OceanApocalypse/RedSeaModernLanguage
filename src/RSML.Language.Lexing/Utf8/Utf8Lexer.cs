@@ -1,11 +1,8 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Data;
-using System.IO.Pipes;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Text;
 
 using OceanApocalypse.RSML.Abstractions;
 using OceanApocalypse.RSML.Abstractions.Diagnostics;
@@ -79,19 +76,23 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 
 		// identifiers and keywords
 		if (b.IsAsciiLetter() || c == '_')
-			return ScanIdentifierOrKeyword(ref reader, startLoc);
+			return ScanIdentifierOrKeyword(ref reader, startLoc, ref currentPosition);
 
 		// standard library identifiers
 		if (c == '$')
-			return ScanStdIdentifier(ref reader, startLoc);
+			return ScanStdIdentifier(ref reader, startLoc, ref currentPosition);
 
 		// member access notation
 		if (c == '.')
-			return Result.Success(new Token(TokenKind.MemberAccess, startLoc, 1L));
+		{
+			reader.Advance(1);
+			currentPosition.Column++;
+			return Result.Success(new Token(TokenKind.MemberAccess, startLoc, 1));
+		}
 
 		// punctuation
 		if (b.IsRsmlPunctuation())
-			return ScanPunctuation(ref reader, startLoc);
+			return ScanPunctuation(ref reader, startLoc, ref currentPosition);
 
 		// todo: check for comments if Configuration.EmitComments is enabled
 
@@ -109,10 +110,18 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		wasUsed = true;
 		int failedRuns = 0;
 
+		var reader = new SequenceReader<byte>(data);
+		var position = AbsolutePosition.Default;
+
+		if (!position.IsValid)
+		{
+			position.Line = 1;
+			position.Column = 1;
+		}
+
 		while (Configuration.MaximumAllowedFailuresPerComponent <= 0 || failedRuns < Configuration.MaximumAllowedFailuresPerComponent)
 		{
-			// todo: create reader here
-			var token = GetNextToken(ref reader);
+			var token = GetNextToken(ref reader, ref position);
 
 			if (token.IsError)
 			{
@@ -136,8 +145,6 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 	private static Result<Token> ScanNumber(ref SequenceReader<byte> reader, byte startChar, long startLoc, ref AbsolutePosition position)
 	{
 		var startPos = position;
-		const byte underscore = (byte)'_';
-		const byte dot = (byte)'.';
 
 		byte b = startChar;
 		bool hasDotSeparator = false;
@@ -158,10 +165,10 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 				));
 			}
 
-			if (b == dot)
+			if (b == '.')
 				hasDotSeparator = true;
 
-		} while (!reader.End && reader.TryPeek(out b) && (b.IsAsciiDigit() || b == underscore || (b == dot && !hasDotSeparator)));
+		} while (!reader.End && reader.TryPeek(out b) && (b.IsAsciiDigit() || b == '_' || (b == '.' && !hasDotSeparator)));
 
 		return Result.Success(new Token(TokenKind.NumericLiteral, startLoc, reader.Consumed - startLoc));
 	}
@@ -213,43 +220,50 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		return Result.Success(new Token(TokenKind.StringLiteral, startLoc, reader.Consumed - startLoc));
 	}
 
-	// todo: fix the method below
-	private Result<Token> ScanStdIdentifier(ref SequenceReader<byte> reader, long startLoc)
+	private static Result<Token> ScanStdIdentifier(ref SequenceReader<byte> reader, long startLoc, ref AbsolutePosition position)
 	{
-		// this points to h in $helloWorld broski
-		int afterStdSymbolIndex = ++cursor; // we also skip past it to avoid extra checks in while loop
+		AbsolutePosition startPos = position;
 
-		while (cursor < Sequence.Length && (Char.IsAsciiLetterOrDigit(Sequence[cursor]) || Sequence[cursor] == '_'))
-			cursor++;
+		do
+		{
+			reader.Advance(1);
+			position.Column++;
 
-		return cursor == afterStdSymbolIndex
+		} while (!reader.End && reader.TryPeek(out byte b) && (b.IsAsciiLetter() || b.IsAsciiDigit() || b == '_'));
+
+		return reader.Consumed == startLoc + 1
 			? Result.Failure<Token>(new(
 				LexerErrorCodes.ExpectedStdIdentifier,
-				Sequence.GetLocationDetails((Index)startLoc),
-				Sequence.GetLocationDetails((Index)cursor),
+				startLoc, startPos,
+				reader.Consumed, position,
 				"Expected a standard library identifier, yet there was no valid identifier after the $ symbol.",
 				Severity.Error
 			))
-			: Result.Success(new Token(TokenKind.StandardLibraryIdentifier, null, startLoc..cursor));
+			: Result.Success(new Token(TokenKind.StandardLibraryIdentifier, startLoc, reader.Consumed - startLoc));
 	}
 
-	// todo: fix the method below
-	private Result<Token> ScanIdentifierOrKeyword(ref SequenceReader<byte> reader, long startLoc)
+	private static Result<Token> ScanIdentifierOrKeyword(ref SequenceReader<byte> reader, long startLoc, ref AbsolutePosition position)
 	{
-		while (cursor < Sequence.Length && (Char.IsAsciiLetterOrDigit(Sequence[cursor]) || Sequence[cursor] == '_'))
-			cursor++;
+		var startPos = position;
 
-		Range range = startLoc..cursor;
-
-		if (Keywords.Contains(Sequence[range]))
+		while (!reader.End && reader.TryPeek(out byte b) && (b.IsAsciiLetter() || b.IsAsciiDigit() || b == '_'))
 		{
-			var token = new Token(Token.GetKeywordKind(Sequence[range]), null, range); // is keyword
+			reader.Advance(1);
+			position.Column++;
+		}
+
+		int sliceLength = (int)(reader.Consumed - startLoc);
+		var slice = reader.Sequence.Slice(startLoc, sliceLength);
+
+		if (Token.Keywords.ContainsUtf8(slice))
+		{
+			var token = new Token(Token.GetKeywordKind(slice), startLoc, sliceLength); // is keyword
 
 			return token.Kind == TokenKind.Unknown
 				? Result.Failure<Token>(new(
 					LexerErrorCodes.FailedToIdentifyKeyword,
-					Sequence.GetLocationDetails(startLoc),
-					Sequence.GetLocationDetails(cursor),
+					startLoc, startPos,
+					reader.Consumed, position,
 					"Despite identifying the object in question as a keyword, the lexer failed to resolve exactly which keyword it was." +
 					"This likely means the keyword in question is reserved for future use, but isn't implemented yet.",
 					Severity.Error
@@ -258,27 +272,40 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		}
 		else
 		{
-			return Result.Success(new Token(TokenKind.Identifier, null, range)); // is identifier
+			return Result.Success(new Token(TokenKind.Identifier, startLoc, sliceLength)); // is identifier
 		}
 	}
 
-	// todo: fix the method below
-	private Result<Token> ScanPunctuation(ref SequenceReader<byte> reader, long startLoc)
+	private static Result<Token> ScanPunctuation(ref SequenceReader<byte> reader, long startLoc, ref AbsolutePosition position)
 	{
-		char c = Sequence[cursor];
-		char? peeked = cursor + 1 >= Sequence.Length ? null : Sequence[++cursor]; // dont error out if out of bounds
-		TokenKind kind = Token.GetPunctuationKind(c, peeked);
+		var startPos = position;
+
+		reader.TryRead(out byte first); // will always work and will always be ASCII
+		position.Column++;
+
+		var successful = reader.TryPeek(out byte second);
+
+		if (successful && !second.IsAscii())
+			successful = false;
+
+		if (successful)
+		{
+			reader.Advance(1);
+			position.Column++;
+		}
+
+		TokenKind kind = Token.GetPunctuationKind(first, successful ? second : (byte)0);
 
 		return kind == TokenKind.Unknown
 			? Result.Failure<Token>(new(
 				LexerErrorCodes.FailedToIdentifyPunctuation,
-				Sequence.GetLocationDetails(startLoc),
-				Sequence.GetLocationDetails(peeked is null ? cursor - 1 : cursor),
+				startLoc, startPos,
+				reader.Consumed, position,
 				"Despite identifying the object in question as punctuation, the lexer failed to resolve exactly which punctuation it was." +
 				"This might mean the punctuation in question is reserved for future use, and not implemented yet.",
 				Severity.Error
 			))
-			: Result.Success(new Token(kind, null, startLoc..cursor));
+			: Result.Success(new Token(kind, startLoc, reader.Consumed - startLoc));
 	}
 
 	private void SkipWhitespaceAndComments(ref SequenceReader<byte> reader)
@@ -329,21 +356,17 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 		isDisposed = true;
 	}
 
-	/// <summary>
-	/// Checks if the given position matches the cursor position in the
-	/// reader. This does not check if the line and column numbers are correct.
-	/// </summary>
-	/// <param name="reader">The reader.</param>
-	/// <param name="position">The expected current position.</param>
-	/// <returns>True if the given position matches the reader's cursor position, in offset.</returns>
-	public static bool IsCorrectPosition(in SequenceReader<byte> reader, AbsolutePosition position) => position.Offset == reader.Consumed;
+	/// <inheritdoc/>
+	public IEnumerable<Token> Lex(string? data)
+	{
+		ArgumentException.ThrowIfNullOrEmpty(data);
+		return Lex(new ReadOnlySequence<byte>(Encoding.Default.GetBytes(data)));
+	}
 
-	// todo: implement the method below
-	public Task<IEnumerable<Token>> LexAsync(PipeStream stream, CancellationToken? cancellationToken = null) => throw new NotImplementedException();
-
-	// todo: implement the method below
-	public IEnumerable<Token> Lex(string? data) => throw new NotImplementedException();
-
-	// todo: implement the method below
-	public IEnumerable<Token> Lex(char[] data) => throw new NotImplementedException();
+	/// <inheritdoc/>
+	public IEnumerable<Token> Lex(char[] data)
+	{
+		ArgumentNullException.ThrowIfNull(data);
+		return Lex(new ReadOnlySequence<byte>(Encoding.Default.GetBytes(data)));
+	}
 }

@@ -1,5 +1,3 @@
-using BenchmarkDotNet.Running;
-
 namespace OceanApocalypse.RSML.Benchmarks;
 
 internal sealed class Program
