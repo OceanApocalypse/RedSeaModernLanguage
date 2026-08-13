@@ -281,6 +281,16 @@ jobs:
         --source "https://api.nuget.org/v3/index.json" \
         --skip-duplicate
 
+    - name: Push to Codeberg.org
+      if: github.ref_type == 'tag' || inputs.debug_mode != true
+      env: 
+        CODEBERG_PACKAGES_TOKEN: ${{ secrets.CODEBERG_PACKAGES_TOKEN }}
+      run: |
+        dotnet nuget push "./nupkgs/*.nupkg" \
+        --api-key $CODEBERG_PACKAGES_TOKEN \
+        --source "https://codeberg.org/api/packages/oas/nuget/index.json" \
+        --skip-duplicate
+
     - name: Generate changelog
       run: |
         npx git-cliff@latest -o ${{ github.workspace }}-CHANGELOG.md --latest
