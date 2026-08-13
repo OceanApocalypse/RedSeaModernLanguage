@@ -26,9 +26,6 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   test-and-analyze:
     name: Test and Analyze
