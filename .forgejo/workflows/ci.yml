@@ -32,7 +32,7 @@ permissions:
 jobs:
   test-and-analyze:
     name: Test and Analyze
-    runs-on: ubuntu-latest
+    runs-on: codeberg-tiny
 
     steps:
       - name: Checkout repository

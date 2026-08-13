@@ -6,7 +6,7 @@
 <div align="center">
 	<details open>
 	<summary style="font-size: small;">Show/hide badges</summary>
-		<a href="https://www.nuget.org/packages/OceanApocalypse.RSML" target="_blank"><img src="https://img.shields.io/nuget/v/OceanApocalypseStudios.RSML?style=for-the-badge&logo=nuget&logoColor=white&logoSize=auto&label=latest%20on%20NuGet%20and%20github&labelColor=%231265fb&color=%2308317b"/></a>
+		<a href="https://www.nuget.org/packages/OceanApocalypse.RSML" target="_blank"><img src="https://img.shields.io/nuget/v/OceanApocalypseStudios.RSML?style=for-the-badge&logo=nuget&logoColor=white&logoSize=auto&label=latest%20on%20NuGet&labelColor=%231265fb&color=%2308317b"/></a>
 		<img src="https://img.shields.io/nuget/dt/OceanApocalypseStudios.RSML?style=for-the-badge&logo=nuget&logoColor=white&logoSize=auto&label=downloads%20(modern)&labelColor=%234929ca&color=%2327156f" />
 		<a href="LICENSE.txt"><img alt="GitHub License" src="https://img.shields.io/github/license/OceanApocalypse/RedSeaModernLanguage?style=for-the-badge&logo=opensourceinitiative&logoColor=white&logoSize=auto&labelColor=%23496300&color=%232b3c00"></a>
 		<br/>
@@ -20,6 +20,7 @@
 				<summary style="font-size: small;">See more badges</summary>
 				<img alt="Sonar Quality Gate (dev branch)" src="https://img.shields.io/sonar/quality_gate/oas_RedSeaModernLanguage/dev?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonar&logoColor=white&label=quality%20gate%20(dev)&labelColor=%2329293c">
 				<img alt="Sonar Coverage (dev branch)" src="https://img.shields.io/sonar/coverage/oas_RedSeaModernLanguage/dev?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonar&logoColor=white&label=coverage%20(dev)&labelColor=%2329293c">
+				<img alt="Gitea Last Commit (branch)" src="https://img.shields.io/gitea/last-commit/oas/RedSeaModernLanguage/main?gitea_url=https%3A%2F%2Fcodeberg.org&style=for-the-badge&logo=codeberg&logoColor=white&logoSize=auto&labelColor=171e26&color=fb923c">
 				<img alt="GitHub commits since latest release (branch)" src="https://img.shields.io/github/commits-since/OceanApocalypse/RedSeaModernLanguage/latest/dev?sort=semver&style=for-the-badge&logo=github&logoSize=auto&labelColor=%231c1c1c&color=%23101010">
 			</details>
 	</details>
