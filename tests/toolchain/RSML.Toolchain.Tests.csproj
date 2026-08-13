@@ -1,11 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<OutputType>Exe</OutputType>
+		<RootNamespace>OceanApocalypse.RSML.Toolchain.Tests</RootNamespace>
 		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
-		<RootNamespace>OceanApocalypse.RSML.Tests</RootNamespace>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,12 +17,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="xunit.v3.mtp-v2" />
-		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\RSML.Abstractions\RSML.Abstractions.csproj" />
-		<ProjectReference Include="..\..\src\RSML.Abstractions.Panic\RSML.Abstractions.Panic.csproj" />
+	  <ProjectReference Include="..\..\src\RSML.Abstractions.Toolchain\RSML.Abstractions.Toolchain.csproj" />
 	</ItemGroup>
 
 </Project>

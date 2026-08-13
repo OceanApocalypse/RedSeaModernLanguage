@@ -24,6 +24,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\RSML.Language.Lexing\RSML.Language.Lexing.csproj" />
 		<ProjectReference Include="..\..\src\RSML.Language.Parsing\RSML.Language.Parsing.csproj" />
+		<ProjectReference Include="..\toolchain\RSML.Toolchain.Tests.csproj" />
 	</ItemGroup>
 
 </Project>

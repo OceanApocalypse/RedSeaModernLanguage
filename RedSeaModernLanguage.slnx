@@ -128,6 +128,7 @@
 
 	<Folder Name="/Tests/">
 		<File Path="tests/Directory.Build.props" />
+		<Project Path="tests/extensibility/RSML.Toolchain.Extensibility.Tests.csproj" />
 		<Project Path="tests/language/RSML.Language.Tests.csproj">
 			<Platform Solution="*|ARM32" Project="ARM32" />
 			<Platform Solution="*|ARM64" Project="ARM64" />
@@ -146,11 +147,6 @@
 			<Platform Solution="*|x64" Project="x64" />
 			<Platform Solution="*|x86" Project="x86" />
 		</Project>
-		<Project Path="tests/RSML.Tests/RSML.Tests.csproj" Id="960c858b-2254-426f-96e5-54a6761c600f">
-			<Platform Solution="*|ARM32" Project="ARM32" />
-			<Platform Solution="*|ARM64" Project="ARM64" />
-			<Platform Solution="*|x64" Project="x64" />
-			<Platform Solution="*|x86" Project="x86" />
-		</Project>
+		<Project Path="tests/toolchain/RSML.Toolchain.Tests.csproj" />
 	</Folder>
 </Solution>

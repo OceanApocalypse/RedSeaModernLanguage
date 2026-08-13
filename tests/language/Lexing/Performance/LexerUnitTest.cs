@@ -1,27 +1,14 @@
-using System.Data;
+using System;
 
+using OceanApocalypse.RSML.Abstractions.Toolchain;
 using OceanApocalypse.RSML.Language.Lexing;
+using OceanApocalypse.RSML.Toolchain.Tests;
 
 namespace OceanApocalypse.RSML.Language.Tests.Lexing.Performance;
 
-public abstract class LexerUnitTest
+public abstract class LexerUnitTest : ToolchainUnitTest
 {
-    protected abstract ILexer CreateLexer();
-
-    [Fact]
-    public void Inject_ModifiesIfNotFrozen()
-    {
-        using var lexer = CreateLexer();
-        lexer.Inject(new() { MaximumAllowedFailuresPerComponent = 1234 });
-        Assert.Equal(1234, lexer.Configuration.MaximumAllowedFailuresPerComponent);
-    }
-
-    [Fact]
-    public void Inject_FailsIfFrozen()
-    {
-        using var lexer = CreateLexer();
-        lexer.Freeze();
-        Assert.Throws<ReadOnlyException>(() => lexer.Inject(new() { MaximumAllowedFailuresPerComponent = 1234 }));
-        Assert.Equal(100, lexer.Configuration.MaximumAllowedFailuresPerComponent);
-    }
+    protected static ILexer AsLexerIfLexer<TComp>(TComp component)
+        where TComp : IToolchainComponent =>
+        component is not ILexer lexer ? throw new Exception("The component is not a lexer.") : lexer;
 }

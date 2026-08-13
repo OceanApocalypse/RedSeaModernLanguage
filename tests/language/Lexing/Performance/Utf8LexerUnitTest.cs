@@ -1,4 +1,5 @@
 using OceanApocalypse.RSML.Abstractions.Diagnostics;
+using OceanApocalypse.RSML.Abstractions.Toolchain;
 using OceanApocalypse.RSML.Language.Lexing;
 using OceanApocalypse.RSML.Language.Lexing.Utf8;
 
@@ -6,7 +7,7 @@ namespace OceanApocalypse.RSML.Language.Tests.Lexing.Performance;
 
 public class Utf8LexerUnitTest : LexerUnitTest
 {
-    protected override ILexer CreateLexer()
+    protected override IToolchainComponent CreateComponent()
     {
         var collector = new DiagnosticCollector();
         return new Utf8Lexer(collector);
