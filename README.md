@@ -38,10 +38,7 @@ the modern language designed to dynamically interpret different logic paths base
 ---
 
 > [!NOTE]
-> For releases other than the latest, you will need to visit the [GitHub mirror](https://github.com/OceanApocalypse/RedSeaModernLanguage) instead. In the Codeberg repository, we only maintain the latest release assets to avoid wasting resources.
-
-> [!NOTE]
-> If you're visiting the GitHub repository, please keep in mind it is a mirror: for the repository accepting pull requests, please visit https://codeberg.org/oas/RedSeaModernLanguage.
+> If you're visiting the Codeberg repository, please keep in mind it is a mirror: for the repository accepting pull requests, please visit https://github.com/OceanApocalypse/RedSeaModernLanguage. We are currently waiting on better infrastructure to make the change.
 
 ## Contents
 - [Red Sea Modern Language (RSML)](#section)
