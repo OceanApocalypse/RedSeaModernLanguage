@@ -139,6 +139,8 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 
 				if (token.Value.Kind == TokenKind.Eof)
 				{
+					tokens[idx] = token.Value;
+					writer.Advance(idx + 1);
 					return writer.WrittenSpan.ToArray();
 				}
 
@@ -356,7 +358,7 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 			}
 			else if (b.IsAsciiWhitespace())
 			{
-				position.Column += (int)reader.AdvancePastAny([9, 11, 12, 30]);
+				position.Column += (int)reader.AdvancePastAny([9, 11, 12, 32]);
 			}
 			else if (b == (byte)'#' && !Configuration.EmitComments)
 			{
@@ -373,7 +375,7 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 	public void Inject(ToolchainConfiguration configuration)
 	{
 		if (wasUsed)
-			throw new ReadOnlyException("The configuration has already been apply and cannot be altered.");
+			throw new ReadOnlyException(nameof(configuration));
 
 		Configuration = configuration;
 	}
@@ -396,8 +398,7 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 
 		// unmanaged things here
 
-		if (disposing)
-		{ } // managed things
+		// managed things if disposing is true
 
 		isDisposed = true;
 	}

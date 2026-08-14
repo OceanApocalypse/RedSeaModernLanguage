@@ -1,4 +1,4 @@
-namespace OceanApocalypse.RSML.Toolchain.Extensibility.Tests;
+namespace OceanApocalypse.RSML.Toolchain.Tests;
 
 public class UnitTest1
 {
