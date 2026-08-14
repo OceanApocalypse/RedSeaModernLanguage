@@ -8,7 +8,7 @@
         <Description>The only DSL that dynamically interprets different logic paths based on an
             host's OS and CPU architecture.</Description>
 
-        <RepositoryUrl>https://github.com/OceanApocalypse/RedSeaModernLanguage/</RepositoryUrl>
+        <RepositoryUrl>https://codeberg.org/oas/RedSeaModernLanguage/</RepositoryUrl>
         <PackageProjectUrl>https://oceanapocalypse.org/rsml-docs/</PackageProjectUrl>
 
         <PackageTags>DSL;language;logic;logic-path;system;host;rsml;rsea;decision;oss</PackageTags>

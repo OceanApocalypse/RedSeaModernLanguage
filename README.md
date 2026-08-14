@@ -98,7 +98,7 @@ would adapt accordingly.
 	<summary><strong>Debug build</strong></summary>
 
 1. Install the [.NET SDK 10.0](https://dotnet.microsoft.com/download).
-2. Clone [this repository](https://github.com/OceanApocalypse/RedSeaModernLanguage).
+2. Clone [this repository](https://codeberg.org/oas/RedSeaModernLanguage).
 3. Open the terminal in the root RSML directory (the one with the solution file).
 
 ```
@@ -112,7 +112,7 @@ dotnet build -c Debug RedSeaModernLanguage.slnx
 	<summary><strong>Optimized build</strong></summary>
 
 1. Install the [.NET SDK 10.0](https://dotnet.microsoft.com/download).
-2. Clone [this repository](https://github.com/OceanApocalypse/RedSeaModernLanguage).
+2. Clone [this repository](https://codeberg.org/oas/RedSeaModernLanguage).
 3. Open the terminal in the root RSML directory (the one with the solution file).
 
 ```
@@ -125,7 +125,7 @@ dotnet build -c Release RedSeaModernLanguage.slnx
 	<summary><strong>CLI Framework-dependent Build</strong> <em>(good if you want a lighter CLI that uses your installed .NET SDK)</em></summary>
 
 1. Install the [.NET SDK 10.0](https://dotnet.microsoft.com/download).
-2. Clone [this repository](https://github.com/OceanApocalypse/RedSeaModernLanguage).
+2. Clone [this repository](https://codeberg.org/oas/RedSeaModernLanguage).
 3. Open the terminal in the root RSML directory (the one with the solution file).
 
 ```
@@ -136,7 +136,7 @@ dotnet publish -c Release -r <rid> src/RSML.CLI/RSML.CLI.csproj --no-self-contai
 	<summary><strong>Native build</strong> <em>(compiles into a shared library)</em></summary>
 
 1. Install the [.NET SDK 10.0](https://dotnet.microsoft.com/download).
-2. Clone [this repository](https://github.com/OceanApocalypse/RedSeaModernLanguage).
+2. Clone [this repository](https://codeberg.org/oas/RedSeaModernLanguage).
 3. Open the terminal in the root RSML directory (the one with the solution file).
 
 ```
