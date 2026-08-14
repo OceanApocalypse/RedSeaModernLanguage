@@ -1,18 +1,18 @@
 name: CI and SonarQube Analysis
 
 on:
-  push:
-    branches:
-      - main
-      - dev
-      - feat/*
-    paths:
-      - "src/**"
-      - "benchmarks/**"
-      - "tests/**"
-      - "**/*.csproj"
-      - "**/*.slnx"
-      - ".forgejo/workflows/ci.yml"
+  #push:
+  #  branches:
+  #    - main
+  #    - dev
+  #    - feat/*
+  #  paths:
+  #    - "src/**"
+  #    - "benchmarks/**"
+  #    - "tests/**"
+  #    - "**/*.csproj"
+  #    - "**/*.slnx"
+  #    - ".forgejo/workflows/ci.yml"
   pull_request:
     branches:
       - main
@@ -29,7 +29,7 @@ on:
 jobs:
   test-and-analyze:
     name: Test and Analyze
-    runs-on: codeberg-tiny
+    runs-on: codeberg-small
 
     steps:
       - name: Checkout repository
