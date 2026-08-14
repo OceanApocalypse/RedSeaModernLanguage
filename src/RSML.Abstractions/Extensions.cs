@@ -77,7 +77,7 @@ public static class Extensions
 		/// </summary>
 		/// <returns>True if the character is ASCII.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool IsAscii() => item is > 127;
+		public bool IsAscii() => item is <= 127;
 	}
 
 	extension(ReadOnlySequence<byte> sequence)
