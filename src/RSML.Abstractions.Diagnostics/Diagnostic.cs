@@ -210,7 +210,7 @@ public readonly struct Diagnostic : IFormattable, IEquatable<Diagnostic>
 
 	private static void ThrowIfInvalidErrorCode(string code, string? paramName = null)
 	{
-		if (code.Length != 6 || code[0] != 'R' || code[1] is not 'I' and not 'L' and not 'S' and not 'P' and not '-' || Char.IsAsciiDigit(code[2]) || Char.IsAsciiDigit(code[3]) || Char.IsAsciiDigit(code[4]) || Char.IsAsciiDigit(code[5]))
+		if (code.Length != 6 || code[0] != 'R' || code[1] is not 'I' and not 'L' and not 'S' and not 'P' and not '-' || !Char.IsAsciiDigit(code[2]) || !Char.IsAsciiDigit(code[3]) || !Char.IsAsciiDigit(code[4]) || !Char.IsAsciiDigit(code[5]))
 			throw new ArgumentException("The error code is not in the correct format. Correct format in Regex is: R(-|I|L|P|S)\\d\\d\\d\\d", paramName ?? nameof(code));
 	}
 }
