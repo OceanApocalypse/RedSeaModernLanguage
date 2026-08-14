@@ -36,7 +36,7 @@
     - **Copyright message:** Copyright 2025-2026 OceanApocalypse
     - **Package license:** Apache 2.0
     - **Description:** set to `The only DSL that dynamically interprets different logic paths based on an host's OS and CPU architecture.`
-    - **Repo URL:** https://codeberg.org/oas/RedSeaModernLanguage/
+    - **Repo URL:** https://github.com/OceanApocalypse/RedSeaModernLanguage/
     - **Package project URL:** https://oceanapocalypse.org/rsml-docs/
     - **Package tags:** set to `DSL;language;logic;logic-path;system;host;rsml;rsea;decision;oss`
     - **Package README file:** set to previously imported `README.md` (see `Common.props`)

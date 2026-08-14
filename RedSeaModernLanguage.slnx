@@ -6,6 +6,14 @@
 		<Platform Name="x64" />
 		<Platform Name="x86" />
 	</Configurations>
+	<Folder Name="/Properties/">
+		<File Path="props/Analyzers.props" />
+		<File Path="props/Common.props" />
+		<File Path="props/Defaults.props" />
+		<File Path="props/NuGet.props" />
+		<File Path="props/README.md" />
+		<File Path="props/Versioning.props" />
+	</Folder>
 
 	<Folder Name="/Solution Items/">
 		<File Path=".editorconfig" />
@@ -118,13 +126,13 @@
 	</Folder>
 
 	<Folder Name="/Benchmarks/">
-    	<Project Path="benchmarks/RSML.Benchmarks.csproj">
-    		<Platform Solution="*|ARM32" Project="ARM32" />
-    		<Platform Solution="*|ARM64" Project="ARM64" />
-    		<Platform Solution="*|x64" Project="x64" />
-    		<Platform Solution="*|x86" Project="x86" />
-    	</Project>
-    </Folder>
+		<Project Path="benchmarks/RSML.Benchmarks.csproj">
+			<Platform Solution="*|ARM32" Project="ARM32" />
+			<Platform Solution="*|ARM64" Project="ARM64" />
+			<Platform Solution="*|x64" Project="x64" />
+			<Platform Solution="*|x86" Project="x86" />
+		</Project>
+	</Folder>
 
 	<Folder Name="/Tests/">
 		<File Path="tests/Directory.Build.props" />
