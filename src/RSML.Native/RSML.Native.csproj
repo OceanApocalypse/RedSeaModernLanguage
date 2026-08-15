@@ -7,7 +7,6 @@
 
 		<!-- Native Publishing -->
 		<PublishAot>true</PublishAot>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<NativeLib>Shared</NativeLib>
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<TieredCompilation>true</TieredCompilation>

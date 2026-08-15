@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup Label="General Properties">
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<OutputType>Library</OutputType>
 		<RootNamespace>OceanApocalypse.RSML.Toolchain.Extensibility.Execution</RootNamespace>
 	</PropertyGroup>
