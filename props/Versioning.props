@@ -6,7 +6,8 @@
         <VersionPrefix>3.0.0</VersionPrefix> <!-- major.minor.patch -->
         <VersionSuffix>prerelease1</VersionSuffix> <!-- pre-release suffix without hyphen (beta,
         alpha, prereleaseX) or empty if stable -->
-        <PackageReleaseNotes>TODO</PackageReleaseNotes> <!-- release notes -->
+        <PackageReleaseNotes>See https://github.com/OceanApocalypse/RedSeaModernLanguage/releases/
+            for the full changelog.</PackageReleaseNotes> <!-- release notes -->
     </PropertyGroup>
 
     <!-- Don't make changes to this group. Everything is determined from data above. -->

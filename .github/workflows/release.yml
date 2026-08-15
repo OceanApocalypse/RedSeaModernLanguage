@@ -1,4 +1,4 @@
-name: Build, pack and release
+name: Publish and release
 
 on:
   workflow_dispatch:
@@ -22,11 +22,99 @@ permissions:
 
 jobs:
 
-  # Builds all the binaries.
-  # Also tests with MTP and forces the workflow to fail if SonarQube fails the quality gate.
-  # Only exception is if IGNORE_SONAR_ANALYSIS is disabled, where Sonar analysis will run,
-  # but won't force the quality gate to fail.
-  build-binaries:
+  # Extracts the version from the project properties or the tag name.
+  extract-version:
+    name: Extract version variable
+    runs-on: ubuntu-latest
+    outputs:
+      semver: ${{ steps.set-semver-var.outputs.semver }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - id: set-semver-var
+        name: Set version variable
+        shell: pwsh
+        run: ./.github/workflows/scripts/set-semver-var.ps1 -RefType "${{ github.ref_type }}" -RefName "${{ github.ref_name }}"
+
+  # Performs an analysis with Sonar.
+  sonar-analysis:
+    name: Analyze with Sonar
+    needs: extract-version
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' || inputs.run_sonar == true
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SEMVER: ${{ needs.extract-version.outputs.semver }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.x.x'
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
+      - name: Restore solution
+        run: dotnet restore
+
+      - name: Cache SonarQube Cloud packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarQube Cloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarQube Cloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ${{ runner.temp }}/scanner
+          dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}/scanner
+
+      - name: Begin analysis
+        run: |
+          ${{ runner.temp }}/scanner/dotnet-sonarscanner begin \
+            /k:"oas_RedSeaModernLanguage" \
+            /o:"oas" \
+            /v:"${{ env.SEMVER }}" \
+            /d:sonar.token="${{ env.SONAR_TOKEN }}" \
+            /d:sonar.cs.vscoveragexml.reportsPaths="**/TestResults/**/*.xml" \
+            /d:sonar.exclusions="**/*.png,**/*.jpg,**/*.jpeg,**/*.ico,**/*.gif" \
+            /d:sonar.qualitygate.wait=true \
+            /d:sonar.qualitygate.timeout=90
+
+      - name: Build solution in Debug mode
+        run: dotnet build --configuration Debug --no-restore
+
+      - name: Test with coverage output
+        run: dotnet test --framework net10.0 --configuration Debug --no-build -- --coverage --coverage-output-format xml
+
+      - name: End analysis (fail if quality gate fails)
+        run: ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
+
+  # Builds necessary binaries with Native AOT compilation.
+  build-native-aot:
+    name: Build binaries (Native AOT)
+    needs: sonar-analysis
+
     strategy:
       fail-fast: true
       matrix:
@@ -84,58 +172,18 @@ jobs:
     - name: Publish Native Project
       shell: pwsh
       run: |
-        $rid = "${{ matrix.rid-os }}-${{ matrix.arch }}"
-        $outputDir = "./dist/RSML.Native-$rid"
-
-        $dotnetArgs = @(
-            "./src/RSML.Native/RSML.Native.csproj",
-            "-c", "Release",
-            "-r", $rid,
-            "-o", $outputDir,
-            "--self-contained", "true"
-        )
-
-        if ("${{ matrix.rid-os }}" -eq "linux") {
-            if ("${{ matrix.arch }}" -eq "arm") {
-                $dotnetArgs += "-p:ObjCopyName=arm-linux-gnueabihf-objcopy"
-                $dotnetArgs += "-p:LinkerFlavor=lld"
-            }
-            elseif ("${{ matrix.arch }}" -eq "arm64") {
-                $dotnetArgs += "-p:ObjCopyName=aarch64-linux-gnu-objcopy"
-                $dotnetArgs += "-p:LinkerFlavor=lld"
-            }
-        }
-
-        dotnet publish @dotnetArgs
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        ./.github/workflows/scripts/publish-native-aot.ps1 \
+          -ProjectName 'RSML.Native' \
+          -OperatingSystemName "${{ matrix.rid-os }}" \
+          -ProcessorArchitecture "${{ matrix.arch }}"
 
     - name: Publish CLI Project
       shell: pwsh
       run: |
-        $rid = "${{ matrix.rid-os }}-${{ matrix.arch }}"
-        $outputDir = "./dist/RSML.CLI-$rid"
-
-        $dotnetArgs = @(
-            "./src/RSML.CLI/RSML.CLI.csproj",
-            "-c", "Release",
-            "-r", $rid,
-            "-o", $outputDir,
-            "--self-contained", "true"
-        )
-
-        if ("${{ matrix.rid-os }}" -eq "linux") {
-            if ("${{ matrix.arch }}" -eq "arm") {
-                $dotnetArgs += "-p:ObjCopyName=arm-linux-gnueabihf-objcopy"
-                $dotnetArgs += "-p:LinkerFlavor=lld"
-            }
-            elseif ("${{ matrix.arch }}" -eq "arm64") {
-                $dotnetArgs += "-p:ObjCopyName=aarch64-linux-gnu-objcopy"
-                $dotnetArgs += "-p:LinkerFlavor=lld"
-            }
-        }
-
-        dotnet publish @dotnetArgs
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        ./.github/workflows/scripts/publish-native-aot.ps1 \
+          -ProjectName 'RSML.CLI' \
+          -OperatingSystemName "${{ matrix.rid-os }}" \
+          -ProcessorArchitecture "${{ matrix.arch }}"
 
     - name: Upload Native Artifacts
       uses: actions/upload-artifact@v4
@@ -151,13 +199,77 @@ jobs:
         path: ./dist/RSML.CLI-${{ matrix.rid-os }}-${{ matrix.arch }}
         if-no-files-found: error
 
+  publish:
+    name: Publish on NuGet, GitHub Packages and Codeberg Packages
+    needs: [extract-version, sonar-analysis]
+    runs-on: ubuntu-latest
+
+    if: github.ref_type == 'tag' || inputs.debug_mode != true
+
+    permissions:
+      id-token: write
+      contents: write
+      packages: write
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.x.x'
+
+      - name: Restore solution
+        run: dotnet restore
+
+      - name: Build solution in Release mode
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Pack projects
+        run: dotnet pack --configuration Release --no-build --output ./nupkgs
+
+      - name: Login to NuGet
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841  # v1.2.0
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet
+        run: |
+          dotnet nuget push "./nupkgs/*.nupkg" \
+            --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} \
+            --source "https://api.nuget.org/v3/index.json" \
+            --skip-duplicate
+
+      - name: Push to GitHub Packages
+        env: 
+          CODEBERG_PACKAGES_TOKEN: ${{ secrets.CODEBERG_PACKAGES_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget push "./nupkgs/*.nupkg" \
+            --api-key ${{ env.GITHUB_TOKEN }} \
+            --source "https://nuget.pkg.github.com/OceanApocalypse/index.json" \
+            --skip-duplicate
+
+      - name: Push to Codeberg Packages
+        env: 
+          CODEBERG_PACKAGES_TOKEN: ${{ secrets.CODEBERG_PACKAGES_TOKEN }}
+        run: |
+          dotnet nuget push "./nupkgs/*.nupkg" \
+            --api-key ${{ env.CODEBERG_PACKAGES_TOKEN }} \
+            --source "https://codeberg.org/api/packages/oas/nuget/index.json" \
+            --skip-duplicate
+
   # Release on NuGet and GitHub.
   deploy:
     permissions:
       id-token: write
       contents: write
 
-    needs: build-binaries
+    needs: [build-native-aot, publish]
     runs-on: ubuntu-latest
 
     steps:
@@ -171,125 +283,10 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v7
-      with:
-        node-version: 24
-
     - name: Download All Artifacts
       uses: actions/download-artifact@v8
       with:
         path: ./all-binaries
-
-    - name: Restore solution
-      run: dotnet restore
-
-    - name: Set up JDK 21
-      uses: actions/setup-java@v5
-      with:
-        java-version: 21
-        distribution: 'zulu'
-
-    - name: Restore
-      run: dotnet restore
-
-    - name: Cache SonarQube Cloud packages
-      uses: actions/cache@v5
-      if: github.ref_type == 'tag' || inputs.run_sonar == true
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
-
-    - name: Cache SonarQube Cloud scanner
-      id: cache-sonar-scanner
-      uses: actions/cache@v5
-      if: github.ref_type == 'tag' || inputs.run_sonar == true
-      with:
-        path: ${{ runner.temp }}/scanner
-        key: ${{ runner.os }}-sonar-scanner
-        restore-keys: ${{ runner.os }}-sonar-scanner
-
-    - name: Install SonarQube Cloud scanner
-      if: steps.cache-sonar-scanner.outputs.cache-hit != 'true' && (github.ref_type == 'tag' || inputs.run_sonar == true)
-      run: |
-        mkdir -p ${{ runner.temp }}/scanner
-        dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}/scanner
-
-    - name: Extract version from solution properties
-      if: github.ref_type != 'tag'
-      shell: pwsh
-      run: |
-        [xml]$xml = Get-Content Directory.Build.props
-        $prefix = $xml.SelectSingleNode("//VersionPrefix")?.InnerText
-        $suffix = $xml.SelectSingleNode("//VersionSuffix")?.InnerText
-        $semver = if ($suffix) { "$prefix-$suffix" } else { $prefix }
-        echo "SEMVER=$semver" >> $env:GITHUB_ENV
-
-    - name: Set version from tag
-      if: github.ref_type == 'tag'
-      shell: pwsh
-      run: echo "SEMVER=${{ github.ref_name }}" >> $env:GITHUB_ENV
-
-    - name: Begin analysis
-      if: github.ref_type == 'tag' || inputs.run_sonar == true
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        ${{ runner.temp }}/scanner/dotnet-sonarscanner begin \
-          /k:"oas_RedSeaModernLanguage" \
-          /o:"oas" \
-          /v:"${{ env.SEMVER }}" \
-          /d:sonar.token="$SONAR_TOKEN" \
-          /d:sonar.cs.vscoveragexml.reportsPaths="**/TestResults/**/*.xml" \
-          /d:sonar.exclusions="**/*.png,**/*.jpg,**/*.jpeg,**/*.ico,**/*.gif" \
-          /d:sonar.qualitygate.wait=true \
-          /d:sonar.qualitygate.timeout=215
-
-    - name: Build solution (debug)
-      if: github.ref_type == 'tag' || inputs.run_sonar == true
-      run: dotnet build --configuration Debug --no-restore
-
-    - name: Test
-      if: github.ref_type == 'tag' || inputs.run_sonar == true
-      run: dotnet test --framework net10.0 --configuration Debug --no-build -- --coverage --coverage-output-format xml
-
-    - name: End analysis (fail if quality gate fails)
-      if: github.ref_type == 'tag' || inputs.run_sonar == true
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
-
-    - name: Build solution (release)
-      run: dotnet build --configuration Release --no-restore
-
-    - name: Pack projects
-      run: dotnet pack --configuration Release --no-build --output ./nupkgs
-
-    # Get a short-lived NuGet API key (v1.2.0)
-    - name: Login to NuGet (OIDC → temp API key)
-      uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841
-      id: login
-      with:
-        user: ${{ secrets.NUGET_USER }}
-
-    - name: Push to NuGet
-      if: github.ref_type == 'tag' || inputs.debug_mode != true
-      run: |
-        dotnet nuget push "./nupkgs/*.nupkg" \
-        --api-key ${{ steps.login.outputs.NUGET_API_KEY }} \
-        --source "https://api.nuget.org/v3/index.json" \
-        --skip-duplicate
-
-    - name: Push to Codeberg.org
-      if: github.ref_type == 'tag' || inputs.debug_mode != true
-      env: 
-        CODEBERG_PACKAGES_TOKEN: ${{ secrets.CODEBERG_PACKAGES_TOKEN }}
-      run: |
-        dotnet nuget push "./nupkgs/*.nupkg" \
-        --api-key $CODEBERG_PACKAGES_TOKEN \
-        --source "https://codeberg.org/api/packages/oas/nuget/index.json" \
-        --skip-duplicate
 
     - name: Generate changelog
       run: |
@@ -297,28 +294,13 @@ jobs:
         cat ${{ github.workspace }}-CHANGELOG.md
         
     - name: Prepare release assets
-      run: |
-        New-Item -ItemType Directory -Force -Path "./release-assets" | Out-Null
-        cd "./all-binaries"
-
-        Get-ChildItem -Directory | ForEach-Object {
-            $dir = $_.Name
-            $destPath = "../release-assets/$dir"
-
-            if ($dir -like "*-win-*") {
-                Write-Host "Windows: $destPath.zip"
-                Compress-Archive -Path "$dir/*" -DestinationPath "$destPath.zip" -Force
-            }
-            else {
-                Write-Host "Linux/macOS: $destPath.tar.gz"
-                tar -czf "$destPath.tar.gz" -C "$dir" .
-            }
-        }
+      shell: pwsh
+      run: ./.github/workflows/scripts/prepare-assets.ps1
 
     - name: Create GitHub Release
       if: github.ref_type == 'tag' || inputs.debug_mode != true
       uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # 3.0.2
       with:
         files: ./release-assets/*.tar.gz
-        body_path: ${{ github.workspace }}-CHANGELOG.txt
+        body_path: ${{ github.workspace }}-CHANGELOG.md
         name: RSML ${{ github.ref_name }}

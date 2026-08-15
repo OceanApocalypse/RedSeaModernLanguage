@@ -13,6 +13,7 @@ on:
       - "**/*.csproj"
       - "**/*.slnx"
       - ".github/workflows/ci.yml"
+
   pull_request:
     branches:
       - main
@@ -24,6 +25,7 @@ on:
       - "**/*.csproj"
       - "**/*.slnx"
     types: [opened, synchronize, reopened]
+
   workflow_dispatch:
 
 permissions:
@@ -31,7 +33,7 @@ permissions:
 
 jobs:
   test-and-analyze:
-    name: Test and Analyze
+    name: Test with coverage and analyze
     runs-on: ubuntu-latest
 
     steps:

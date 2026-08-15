@@ -24,8 +24,6 @@ updates:
       major:
         update-types:
           - "major"
-    assignees:
-      - "mf366-dev"
     labels:
       - "Scope/Dependencies"
     commit-message:
