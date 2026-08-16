@@ -210,8 +210,8 @@ jobs:
     - name: Upload hybrid CLI artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: rsml-cli-hybrid
-        path: ./dist/RSML.CLI-hybrid
+        name: rsml-cli-hybrid-${{ matrix.rid-os }}-${{ matrix.arch }}
+        path: ./dist/hybrid-${{ matrix.rid-os }}-${{ matrix.arch }}
         if-no-files-found: error
 
   publish:
@@ -236,8 +236,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v8
         with:
-          name: rsml-cli-hybrid
-          path: ./nupkgs
+          path: ./hybrid-rid
           
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
@@ -253,7 +252,7 @@ jobs:
       - name: Pack projects
         run: |
           dotnet pack ./src/RSML.CLI/RSML.CLI.csproj -p:IsPackable=true --output ./hybrid
-          dotnet pack ./src/RSML.CLI/RSML.CLI.csproj -r any -p:PublishAot=false -p:IsPackable=true --output ./hybrid
+          dotnet pack ./src/RSML.CLI/RSML.CLI.csproj -r any -p:PublishAot=false -p:IsPackable=true --output ./hybrid-rid
           dotnet pack --configuration Release --no-build --output ./nupkgs
 
       - name: Login to NuGet
@@ -274,13 +273,9 @@ jobs:
       - name: Push hybrid CLI to NuGet
         if: github.ref_type == 'tag' || inputs.debug_mode != true
         run: |
-          dotnet nuget push "./hybrid/*.CLI.${{ env.SEMVER }}*.nupkg" \
+          dotnet nuget push "./hybrid-rid/*.nupkg" \
             --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} \
             --source "https://api.nuget.org/v3/index.json"
-
-          dotnet nuget push "./hybrid/*.CLI.*.${{ env.SEMVER }}*.nupkg" \
-            --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} \
-            --source "https://api.nuget.org/v3/index.json" \
             --skip-duplicate
 
       - name: Push to GitHub Packages
@@ -303,8 +298,9 @@ jobs:
             --source "https://codeberg.org/api/packages/oas/nuget/index.json" \
             --skip-duplicate
 
-  # Release on NuGet and GitHub.
-  deploy:
+  release:
+    name: Release on GitHub
+
     permissions:
       id-token: write
       contents: write

@@ -23,7 +23,7 @@ param(
 
 $ProjectName = "RSML.CLI"
 $rid = "$OperatingSystemName-$ProcessorArchitecture"
-$outputDir = "./dist/$ProjectName-hybrid"
+$outputDir = "./dist/hybrid-$OperatingSystemName-$ProcessorArchitecture"
 
 $dotnetArgs = @(
     "./src/$ProjectName/$ProjectName.csproj",
