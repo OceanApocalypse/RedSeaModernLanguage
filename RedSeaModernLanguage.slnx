@@ -136,25 +136,23 @@
 
 	<Folder Name="/Tests/">
 		<File Path="tests/Directory.Build.props" />
-		<Project Path="tests/extensibility/RSML.Toolchain.Extensibility.Tests.csproj" />
+		<Project Path="tests/extensibility/RSML.Toolchain.Extensibility.Tests.csproj">
+			<Platform Solution="*|ARM32" Project="ARM32" />
+			<Platform Solution="*|ARM64" Project="ARM64" />
+			<Platform Solution="*|x64" Project="x64" />
+			<Platform Solution="*|x86" Project="x86" />
+		</Project>
 		<Project Path="tests/language/RSML.Language.Tests.csproj">
 			<Platform Solution="*|ARM32" Project="ARM32" />
 			<Platform Solution="*|ARM64" Project="ARM64" />
 			<Platform Solution="*|x64" Project="x64" />
 			<Platform Solution="*|x86" Project="x86" />
 		</Project>
-		<Project Path="tests/RSML.InternalTests/RSML.InternalTests.csproj" Id="bcf74754-66fd-40c5-9faa-6d803d66467f">
+		<Project Path="tests/toolchain/RSML.Toolchain.Tests.csproj">
 			<Platform Solution="*|ARM32" Project="ARM32" />
 			<Platform Solution="*|ARM64" Project="ARM64" />
 			<Platform Solution="*|x64" Project="x64" />
 			<Platform Solution="*|x86" Project="x86" />
 		</Project>
-		<Project Path="tests/RSML.NativeTests/RSML.NativeTests.csproj" Id="9c3a8c42-d460-4a2a-bcb0-5363a9d7022c">
-			<Platform Solution="*|ARM32" Project="ARM32" />
-			<Platform Solution="*|ARM64" Project="ARM64" />
-			<Platform Solution="*|x64" Project="x64" />
-			<Platform Solution="*|x86" Project="x86" />
-		</Project>
-		<Project Path="tests/toolchain/RSML.Toolchain.Tests.csproj" />
 	</Folder>
 </Solution>

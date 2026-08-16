@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup Label="General Properties">
+		<TargetFrameworks>net10.0;net9.0</TargetFrameworks>
 		<OutputType>Library</OutputType>
 		<RootNamespace>OceanApocalypse.RSML.Abstractions</RootNamespace>
 	</PropertyGroup>

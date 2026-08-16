@@ -18,6 +18,8 @@
         <RepositoryType>git</RepositoryType>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <NeutralLanguage>en</NeutralLanguage>
+
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 </Project>
     

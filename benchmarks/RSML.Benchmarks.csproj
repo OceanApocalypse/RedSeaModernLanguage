@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<TargetFrameworks>net10.0;net9.0</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>OceanApocalypse.RSML.Benchmarks</RootNamespace>
 		<DebugType>pdbonly</DebugType>
