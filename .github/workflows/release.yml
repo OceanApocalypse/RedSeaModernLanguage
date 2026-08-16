@@ -304,6 +304,8 @@ jobs:
     permissions:
       id-token: write
       contents: write
+      attestations: write
+      artifact-metadata: write
 
     needs: [extract-version, build-native-aot, publish]
     runs-on: ubuntu-latest
@@ -316,11 +318,6 @@ jobs:
       uses: actions/checkout@v7
       with:
         fetch-depth: 0
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v6
-      with:
-        dotnet-version: '10.0.x'
 
     - name: Download all artifacts
       uses: actions/download-artifact@v8
@@ -336,10 +333,15 @@ jobs:
       shell: pwsh
       run: ./.github/workflows/scripts/prepare-assets.ps1
 
+    - name: Attest release assets
+      uses: actions/attest@v4
+      with:
+        subject-path: "./release-assets/*.tar.gz, ./release-assets/*.zip"
+
     - name: Create GitHub Release
       if: github.ref_type == 'tag' || inputs.debug_mode != true
       uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # 3.0.2
       with:
-        files: ./release-assets/*.tar.gz
+        files: "./release-assets/*.tar.gz, ./release-assets/*.zip"
         body_path: ${{ github.workspace }}-CHANGELOG.md
         name: RSML ${{ env.SEMVER }}
