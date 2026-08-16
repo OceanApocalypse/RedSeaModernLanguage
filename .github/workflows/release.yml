@@ -183,26 +183,15 @@ jobs:
 
     - name: Publish Native Project
       shell: pwsh
-      run: |
-        ./.github/workflows/scripts/publish-native-aot.ps1 \
-          -ProjectName 'RSML.Native' \
-          -OperatingSystemName "${{ matrix.rid-os }}" \
-          -ProcessorArchitecture "${{ matrix.arch }}"
+      run: ./.github/workflows/scripts/publish-native-aot.ps1 'RSML.Native' "${{ matrix.rid-os }}" "${{ matrix.arch }}"
 
     - name: Publish CLI Project
       shell: pwsh
-      run: |
-        ./.github/workflows/scripts/publish-native-aot.ps1 \
-          -ProjectName 'RSML.CLI' \
-          -OperatingSystemName "${{ matrix.rid-os }}" \
-          -ProcessorArchitecture "${{ matrix.arch }}"
+      run: ./.github/workflows/scripts/publish-native-aot.ps1 'RSML.CLI' "${{ matrix.rid-os }}" "${{ matrix.arch }}"
 
     - name: Build hybrid CLI
       shell: pwsh
-      run: |
-        ./.github/workflows/scripts/build-hybrid-cli.ps1 \
-          -OperatingSystemName "${{ matrix.rid-os }}" \
-          -ProcessorArchitecture "${{ matrix.arch }}"
+      run: ./.github/workflows/scripts/build-hybrid-cli.ps1 "${{ matrix.rid-os }}" "${{ matrix.arch }}"
 
     - name: Upload native artifacts
       uses: actions/upload-artifact@v4
