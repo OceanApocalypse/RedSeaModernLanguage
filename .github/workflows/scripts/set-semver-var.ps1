@@ -24,7 +24,7 @@ param(
 )
 
 if ($RefType -eq 'tag') {
-    $semver = $RefName
+    $semver = $RefName.Substring(1)
 }
 else {
     [xml]$xml = Get-Content ".\props\Versioning.props"

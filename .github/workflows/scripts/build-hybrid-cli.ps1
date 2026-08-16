@@ -1,13 +1,10 @@
 <#
 .SYNOPSIS
-This script is used to publish a package using Native AOT.
-
-.DESCRIPTION
-This script publishes the given package using Native AOT compilation
-aimed towards the given system, defined by OperatingSystemName and ProcessorArchitecture.
+This script is used to build RSML's CLI under the hybrid tool aproach.
+Learn more about hybrid tools here: https://github.com/richlander/dotnet10-hybrid-tool/
 
 .EXAMPLE
-.\publish-native-aot.ps1 $ProjectName ${{ matrix.rid-os }} ${{ matrix.arch }}
+.\build-hybrid-cli.ps1 ${{ matrix.rid-os }} ${{ matrix.arch }}
 
 .NOTES
 Created by Matthew. Maintained by Ocean Apocalypse.
@@ -19,23 +16,19 @@ binaries for ARM and ARM64.
 
 param(
     [Parameter(Mandatory = $true)]
-    [string]$ProjectName,
-    [Parameter(Mandatory = $true)]
     [string]$OperatingSystemName,
     [Parameter(Mandatory = $true)]
     [string]$ProcessorArchitecture
 )
 
+$ProjectName = "RSML.CLI"
 $rid = "$OperatingSystemName-$ProcessorArchitecture"
-$outputDir = "./dist/$ProjectName-$rid"
+$outputDir = "./dist/$ProjectName-hybrid"
 
 $dotnetArgs = @(
     "./src/$ProjectName/$ProjectName.csproj",
     "-c", "Release",
-    "-r", $rid,
-    "-o", $outputDir,
-    "--self-contained", "true",
-    "--no-restore"
+    "-o", $outputDir
 )
 
 if ($OperatingSystemName -eq "linux") {
@@ -49,7 +42,7 @@ if ($OperatingSystemName -eq "linux") {
     }
 }
 
-dotnet publish @dotnetArgs
+dotnet pack -r $rid -p:IsPackable=true @dotnetArgs
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
