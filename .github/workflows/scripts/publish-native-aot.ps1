@@ -34,8 +34,7 @@ $dotnetArgs = @(
     "-c", "Release",
     "-r", $rid,
     "-o", $outputDir,
-    "--self-contained", "true",
-    "--no-restore"
+    "--self-contained", "true"
 )
 
 if ($OperatingSystemName -eq "linux") {
