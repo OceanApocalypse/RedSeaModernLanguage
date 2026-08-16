@@ -44,31 +44,35 @@ jobs:
     name: Analyze with Sonar
     needs: extract-version
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' || inputs.run_sonar == true
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SEMVER: ${{ needs.extract-version.outputs.semver }}
     steps:
       - name: Checkout repo
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup .NET
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.x.x'
 
       - name: Setup JDK
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: 'zulu'
 
       - name: Restore solution
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         run: dotnet restore
 
       - name: Cache SonarQube Cloud packages
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         uses: actions/cache@v5
         with:
           path: ~/.sonar/cache
@@ -76,6 +80,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache SonarQube Cloud scanner
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         id: cache-sonar-scanner
         uses: actions/cache@v5
         with:
@@ -84,12 +89,13 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar-scanner
 
       - name: Install SonarQube Cloud scanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true' && (github.ref_type == 'tag' || inputs.run_sonar == true)
         run: |
           mkdir -p ${{ runner.temp }}/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}/scanner
 
       - name: Begin analysis
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         run: |
           ${{ runner.temp }}/scanner/dotnet-sonarscanner begin \
             /k:"oas_RedSeaModernLanguage" \
@@ -102,12 +108,15 @@ jobs:
             /d:sonar.qualitygate.timeout=90
 
       - name: Build solution in Debug mode
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         run: dotnet build --configuration Debug --no-restore
 
       - name: Test with coverage output
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         run: dotnet test --framework net10.0 --configuration Debug --no-build -- --coverage --coverage-output-format xml
 
       - name: End analysis (fail if quality gate fails)
+        if: github.ref_type == 'tag' || inputs.run_sonar == true
         run: ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
   # Builds necessary binaries with Native AOT compilation.
@@ -221,7 +230,6 @@ jobs:
     needs: [extract-version, sonar-analysis]
     runs-on: ubuntu-latest
 
-    if: github.ref_type == 'tag' || inputs.debug_mode != true
     env:
       SEMVER: ${{ needs.extract-version.outputs.semver }}
 
@@ -260,12 +268,14 @@ jobs:
           dotnet pack --configuration Release --no-build --output ./nupkgs
 
       - name: Login to NuGet
+        if: github.ref_type == 'tag' || inputs.debug_mode != true
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841  # v1.2.0
         id: nuget-login
         with:
           user: ${{ secrets.NUGET_USER }}
 
       - name: Push to NuGet
+        if: github.ref_type == 'tag' || inputs.debug_mode != true
         run: |
           dotnet nuget push "./nupkgs/*.nupkg" \
             --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} \
@@ -273,6 +283,7 @@ jobs:
             --skip-duplicate
 
       - name: Push hybrid CLI to NuGet
+        if: github.ref_type == 'tag' || inputs.debug_mode != true
         run: |
           dotnet nuget push "./hybrid/*.CLI.${{ env.SEMVER }}*.nupkg" \
             --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} \
@@ -284,8 +295,8 @@ jobs:
             --skip-duplicate
 
       - name: Push to GitHub Packages
+        if: github.ref_type == 'tag' || inputs.debug_mode != true
         env: 
-          CODEBERG_PACKAGES_TOKEN: ${{ secrets.CODEBERG_PACKAGES_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           dotnet nuget push "./nupkgs/*.nupkg" \
@@ -294,6 +305,7 @@ jobs:
             --skip-duplicate
 
       - name: Push to Codeberg Packages
+        if: github.ref_type == 'tag' || inputs.debug_mode != true
         env: 
           CODEBERG_PACKAGES_TOKEN: ${{ secrets.CODEBERG_PACKAGES_TOKEN }}
         run: |
