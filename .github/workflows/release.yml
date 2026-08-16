@@ -227,7 +227,7 @@ jobs:
 
   publish:
     name: Publish on NuGet, GitHub Packages and Codeberg Packages
-    needs: [extract-version, sonar-analysis]
+    needs: [build-native-aot, extract-version, sonar-analysis]
     runs-on: ubuntu-latest
 
     env:
