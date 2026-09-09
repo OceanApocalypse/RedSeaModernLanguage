@@ -11,7 +11,7 @@
 		
 		<!-- Tests and benchmarks -->
 		<PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
-		<PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.10.0" />
+		<PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.0" />
 		<PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
 		<PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.8" Condition="'$(OS)' == 'Windows_NT'" />
 	</ItemGroup>
