@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 
@@ -13,7 +14,19 @@ namespace OceanApocalypse.RSML.Language.Lexing.Utf8;
 public interface IUtf8Lexer : ILexer
 {
 	/// <summary>
-	/// Tokenizes a source passed to the lexer.
+	/// Tokenizes an array of UTF-8 characters passed to the lexer.
+	/// </summary>
+	/// <returns>The tokens.</returns>
+	IEnumerable<Token> Lex(byte[] data);
+
+	/// <summary>
+	/// Tokenizes a sliced array of UTF-8 characters passed to the lexer.
+	/// </summary>
+	/// <returns>The tokens.</returns>
+	IEnumerable<Token> Lex(byte[] data, int start, int length);
+
+	/// <summary>
+	/// Tokenizes a sequence passed to the lexer.
 	/// </summary>
 	/// <returns>The tokens.</returns>
 	IEnumerable<Token> Lex(ReadOnlySequence<byte> data);

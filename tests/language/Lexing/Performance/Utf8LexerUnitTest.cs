@@ -1,7 +1,10 @@
 using System.Data;
 using System.Linq;
 
+using Microsoft.ApplicationInsights.DataContracts;
+
 using OceanApocalypse.RSML.Abstractions.Diagnostics;
+using OceanApocalypse.RSML.Abstractions.Panic;
 using OceanApocalypse.RSML.Language.Lexing.Tokens;
 using OceanApocalypse.RSML.Language.Lexing.Utf8;
 
@@ -11,7 +14,7 @@ public class Utf8LexerUnitTest
 {
     private static Utf8Lexer CreateLexer()
     {
-        var diagnostics = new DiagnosticCollector();
+        var diagnostics = new DiagnosticCollector(Severity.Message);
         return new(diagnostics);
     }
 
@@ -20,22 +23,22 @@ public class Utf8LexerUnitTest
 	[InlineData("#NoWhitespaceOverHere")]
 	[InlineData("  #  T h i s  f e e l s  o m i n o u s ! !\n\n\n# $host.systemName == \"linux\"\n\n\n\n\r\n\n\n\r")]
 	[InlineData("\t# This is seriously a very  \r\n       # dumb comment")]
-	public void GetNextToken_SkipsCommentsIfNotConfigured(string data)
-	{
-		using var lexer = CreateLexer();
-		lexer.Inject(new() { EmitComments = false });
+    public void Lex_SkipsCommentsIfNotConfigured(string data)
+    {
+        using var lexer = CreateLexer();
+        lexer.Inject(new() { EmitComments = false });
 
-		var tokens = (lexer.Lex(data) as Token[])?.ToArray();
-		Assert.Single(tokens);
-		Assert.Equal(TokenKind.Eof, tokens[0].Kind);
-	}
+        var tokens = (lexer.Lex(data) as Token[])?.ToArray();
+        Assert.Single(tokens);
+        Assert.Equal(TokenKind.Eof, tokens[0].Kind);
+    }
 
 	[Theory]
     [InlineData("# Simple comment, does it skip?", 1)]
     [InlineData("#NoWhitespaceOverHere", 1)]
     [InlineData("  #  T h i s  f e e l s  o m i n o u s ! !\n\n\n# $host.systemName == \"linux\"\n\n\n\n\r\n\n\n\r", 2)]
     [InlineData("\t# This is seriously a very  \r\n       # dumb comment", 2)]
-    public void GetNextToken_DoesNotSkipCommentsIfConfigured(string data, int commentAmount)
+    public void Lex_DoesNotSkipCommentsIfConfigured(string data, int commentAmount)
     {
         using var lexer = CreateLexer();
         lexer.Inject(new() { EmitComments = true });
@@ -73,5 +76,23 @@ public class Utf8LexerUnitTest
         lexer.Lex("# This is a very dumb comment, seriously!!");
         Assert.Throws<ReadOnlyException>(() => lexer.Inject(new() { MaximumAllowedFailuresPerComponent = 1234 }));
         Assert.Equal(100, lexer.Configuration.MaximumAllowedFailuresPerComponent);
+    }
+
+    [Fact]
+    public void Lex_FailsIfExceedsMaximumAllowedFailures()
+    {
+        using var lexer = CreateLexer();
+        lexer.Inject(new() { MaximumAllowedFailuresPerComponent = 1 });
+        Assert.Throws<ExceededMaxAmountOfFailuresException>(() => lexer.Lex("let a = \"wait I thought strings were supposed to end"));
+    }
+
+    [Theory]
+    [InlineData()]
+    public void Lex_TokenizesStringsCorrectly(string data, int errorCount, int tokenCount)
+    {
+        using var lexer = CreateLexer();
+        var tokens = lexer.Lex(data);
+        Assert.Equal(errorCount, lexer.Diagnostics.Count(d => d.Severity >= Severity.Error));
+        Assert.Equal(tokenCount, tokens.Count(t => t.Kind == TokenKind.StringLiteral));
     }
 }

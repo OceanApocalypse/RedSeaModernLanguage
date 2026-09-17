@@ -29,7 +29,7 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 	/// <summary>
 	/// A collector containing all emitted diagnostics.
 	/// </summary>
-	protected DiagnosticCollector Diagnostics { get; } = diagnosticCollector;
+	public DiagnosticCollector Diagnostics { get; } = diagnosticCollector;
 
 	/// <inheritdoc/>
 	public ToolchainConfiguration Configuration { get; protected set; } = configuration ?? ToolchainConfiguration.Default;
@@ -104,6 +104,17 @@ public class Utf8Lexer(DiagnosticCollector diagnosticCollector, ToolchainConfigu
 			Severity.Critical
 		));
 	}
+
+	/// <inheritdoc/>
+	public IEnumerable<Token> Lex(byte[] data)
+	{
+		ArgumentNullException.ThrowIfNull(data);
+		return Lex(data, 0, data.Length);
+	}
+
+	/// <inheritdoc/>
+	public IEnumerable<Token> Lex(byte[] data, int start, int length) =>
+		Lex(new ReadOnlySequence<byte>(data, start, length));
 
 	/// <inheritdoc/>
 	public IEnumerable<Token> Lex(ReadOnlySequence<byte> data)
